@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+    <Esri>
+        <CreaDate>20180709</CreaDate>
+        <CreaTime>18482900</CreaTime>
+        <ArcGISFormat>1.0</ArcGISFormat>
+        <SyncOnce>TRUE</SyncOnce>
+        <DataProperties>
+            <lineage>
+                <Process
+                    ToolSource="c:\program files (x86)\arcgis\desktop10.2\ArcToolbox\Toolboxes\Data Management Tools.tbx\CalculateField"
+                    Date="20180412" Time="085809">CalculateField DISA_抽稀后OK z [PAC] VB #
+                </Process>
+                <Process
+                    ToolSource="c:\program files (x86)\arcgis\desktop10.2\ArcToolbox\Toolboxes\Data Management Tools.tbx\CalculateField"
+                    Date="20180412" Time="085857">CalculateField DISA_抽稀后OK z [PAC] VB #
+                </Process>
+                <Process
+                    ToolSource="c:\program files (x86)\arcgis\desktop10.2\ArcToolbox\Toolboxes\Data Management Tools.tbx\CalculateField"
+                    Date="20180412" Time="085915">CalculateField DISA_抽稀后OK GB [GB] VB #
+                </Process>
+                <Process
+                    ToolSource="c:\program files (x86)\arcgis\desktop10.2\ArcToolbox\Toolboxes\Data Management Tools.tbx\CalculateField"
+                    Date="20180412" Time="085935">CalculateField DISA_抽稀后OK GB [z] VB #
+                </Process>
+                <Process
+                    ToolSource="c:\program files (x86)\arcgis\desktop10.2\ArcToolbox\Toolboxes\Data Management Tools.tbx\RepairGeometry"
+                    Date="20180416" Time="164035">RepairGeometry K:\全球行政区划2018.04.17.gdb\DISA_抽稀后 DELETE_NULL
+                </Process>
+            </lineage>
+            <itemProps>
+                <itemLocation>
+                    <linkage Sync="TRUE">file://\\ZHENGER-PC\D$\Worldwind\WWGIS\src\edu\zhenger\data\China_District
+                    </linkage>
+                    <protocol Sync="TRUE">Local Area Network</protocol>
+                </itemLocation>
+            </itemProps>
+            <copyHistory>
+                <copy source="D:\Workspace\shapefiles\全国矢量数据\China_district\China_District"
+                      dest="\\ZHENGER-PC\D$\Worldwind\WWGIS\src\edu\zhenger\data\China_District" date="20180709"
+                      time="18482900"></copy>
+            </copyHistory>
+        </DataProperties>
+    </Esri>
+</metadata>

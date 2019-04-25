@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+    <Esri>
+        <CreaDate>20180709</CreaDate>
+        <CreaTime>18283700</CreaTime>
+        <ArcGISFormat>1.0</ArcGISFormat>
+        <SyncOnce>TRUE</SyncOnce>
+        <DataProperties>
+            <itemProps>
+                <itemLocation>
+                    <linkage Sync="TRUE">file://\\ZHENGER-PC\D$\Worldwind\WWGIS\src\edu\zhenger\data\testZone</linkage>
+                    <protocol Sync="TRUE">Local Area Network</protocol>
+                </itemLocation>
+            </itemProps>
+            <copyHistory>
+                <copy source="D:\Workspace\shapefiles\countries\testZone"
+                      dest="\\ZHENGER-PC\D$\Worldwind\WWGIS\src\edu\zhenger\data\testZone" date="20180709"
+                      time="18283700"></copy>
+            </copyHistory>
+        </DataProperties>
+    </Esri>
+</metadata>

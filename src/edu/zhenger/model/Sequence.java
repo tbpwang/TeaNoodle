@@ -12,14 +12,14 @@ package edu.zhenger.model;
  * @Function: 格网系统的一种排列方式，即三角形法排列（建立邻近关系）
  * @Date: 2017/10/18
  */
-public class Ranks
+public class Sequence
 {
     private int row, col;
     private String geocode;
     private int level;
     private boolean isChecked =false;
 
-    public Ranks(int row, int col, String geocode, int level)
+    public Sequence(int row, int col, String geocode, int level)
     {
         this.row = row;
         this.col = col;
@@ -27,7 +27,7 @@ public class Ranks
         this.level = level;
     }
 
-    public Ranks(int row, int col, String geocode)
+    public Sequence(int row, int col, String geocode)
     {
         this.row = row;
         this.col = col;
@@ -88,10 +88,10 @@ public class Ranks
         if (o == null || getClass() != o.getClass())
             return false;
 
-        Ranks ranks = (Ranks) o;
+        Sequence sequence = (Sequence) o;
 
-        return row == ranks.row && col == ranks.col && (geocode != null ? geocode.equals(ranks.geocode)
-            : ranks.geocode == null);
+        return row == sequence.row && col == sequence.col && (geocode != null ? geocode.equals(sequence.geocode)
+            : sequence.geocode == null);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class Ranks
     @Override
     public String toString()
     {
-        return "Ranks{" +
+        return "Sequence{" +
             "level=" + level +
             ",geocode=" + geocode +
             ", row=" + row +

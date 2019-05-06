@@ -6,7 +6,6 @@
 
 package edu.zhenger.model;
 
-import edu.zhenger.Partition;
 import gov.nasa.worldwind.geom.LatLon;
 
 import java.util.*;
@@ -17,7 +16,7 @@ import java.util.*;
  * @Function: Class I subdivision with mid-arcs, partition with recursion
  * @Date: 2018/7/6
  */
-public class OctantMeshMidArcs implements Partition
+public class OctantMeshMidArcs
 {
     private Trigon trigon;
     private int level;
@@ -67,7 +66,7 @@ public class OctantMeshMidArcs implements Partition
         }
     }
 
-    @Override
+
     public Trigon[] subdivide(Trigon trigon)
     {
         Trigon[] children = new Trigon[4];

@@ -27,7 +27,7 @@ public interface Grid
 
     void add(Cell cell);
 
-    Cell search(Ranks ranks);
+    Cell search(Sequence sequence);
 
     Cell search(int row, int column);
 
@@ -35,5 +35,5 @@ public interface Grid
 
     double halveDistance(Cell cell1, Cell cell2);
 
-    Ranks computeRanks(Cell cell);
+    Sequence computeRanks(Cell cell);
 }

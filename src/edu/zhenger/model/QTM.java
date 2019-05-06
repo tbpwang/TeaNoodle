@@ -22,12 +22,11 @@ import java.util.Arrays;
  * @Function:
  * @Date: 2017/10/18
  */
-public class QTM implements Grid
+public class QTM extends DGGS implements Grid
 {
     private int level;
     // storage is as row and col order.
     private Trigon[][] ranksCells;
-
     private Neighbor neighbor;
 
     private Globe globe;
@@ -40,25 +39,25 @@ public class QTM implements Grid
     public QTM(int level)
     {
         this.level = level;
-        ranksCells = new Trigon[(int) Math.pow(2, level)][];
+        ranksCells = new Trigon [(int) Math.pow(2, level)][];
         globe = Sphere.getInstance();
     }
 
     private class Neighbor implements Adjacency
     {
-        Trigon flat;
+        Trigon cell;
         // Angle Point
-        Ranks[] vertexRanks = null;
+        Sequence[] vertexRanks = null;
         // half side Angle Point
-        Ranks[] subVertexRanks = null;
+        Sequence[] subVertexRanks = null;
         // Edge Line
-        Ranks[] sideRanks = null;
+        Sequence[] sideRanks = null;
 
         private Neighbor(Trigon cell)
         {
             if (cell != null)
             {
-                flat = cell;
+                this.cell = cell;
             }
             else
             {
@@ -95,7 +94,7 @@ public class QTM implements Grid
                 int index = 0;
                 if (counter != 0)
                 {
-                    sideRanks = new Ranks[counter];
+                    sideRanks = new Sequence[counter];
 
                     if (search(row - 1, col + 1) != null)
                         sideRanks[index++] = QTM.this.computeRanks(search(row - 1, col + 1));
@@ -116,11 +115,11 @@ public class QTM implements Grid
                 if (isRow(row + 1) && isColumn(row + 1, col - 1))
                     counter++;
 
-                // if exist, new Ranks[counter]
+                // if exist, new Sequence[counter]
                 index = 0;
                 if (counter != 0)
                 {
-                    vertexRanks = new Ranks[counter];
+                    vertexRanks = new Sequence[counter];
 
                     if (search(row - 1, col - 1) != null)
                         vertexRanks[index++] = QTM.this.computeRanks(search(row - 1, col - 1));
@@ -145,11 +144,11 @@ public class QTM implements Grid
                 if (isRow(row + 1) && isColumn(row + 1, col))
                     counter++;
 
-                // if exist, new Ranks[counter]
+                // if exist, new Sequence[counter]
                 index = 0;
                 if (counter != 0)
                 {
-                    subVertexRanks = new Ranks[counter];
+                    subVertexRanks = new Sequence[counter];
 
                     if (search(row - 1, col) != null)
                         subVertexRanks[index++] = QTM.this.computeRanks(search(row - 1, col));
@@ -176,11 +175,11 @@ public class QTM implements Grid
                 if (isRow(row + 1) && isColumn(row + 1, col - 1))
                     counter++;
 
-                // if exist, new Ranks[counter]
+                // if exist, new Sequence[counter]
                 int index = 0;
                 if (counter != 0)
                 {
-                    sideRanks = new Ranks[counter];
+                    sideRanks = new Sequence[counter];
 
                     if (search(row, col - 1) != null)
                         sideRanks[index++] = QTM.this.computeRanks(search(row, col - 1));
@@ -199,11 +198,11 @@ public class QTM implements Grid
                 if (isRow(row + 1) && isColumn(row + 1, col + 1))
                     counter++;
 
-                // if exist, new Ranks[counter]
+                // if exist, new Sequence[counter]
                 index = 0;
                 if (counter != 0)
                 {
-                    vertexRanks = new Ranks[counter];
+                    vertexRanks = new Sequence[counter];
 
                     if (search(row - 1, col + 1) != null)
                         vertexRanks[index++] = QTM.this.computeRanks(search(row - 1, col + 1));
@@ -228,11 +227,11 @@ public class QTM implements Grid
                 if (isRow(row + 1) && isColumn(row + 1, col))
                     counter++;
 
-                // if exist, new Ranks[counter]
+                // if exist, new Sequence[counter]
                 index = 0;
                 if (counter != 0)
                 {
-                    subVertexRanks = new Ranks[counter];
+                    subVertexRanks = new Sequence[counter];
 
                     if (search(row - 1, col) != null)
                         subVertexRanks[index++] = QTM.this.computeRanks(search(row - 1, col));
@@ -253,23 +252,23 @@ public class QTM implements Grid
         @Override
         public Cell getFlat()
         {
-            return flat;
+            return cell;
         }
 
         @Override
-        public Ranks[] getSubVertexRanks()
+        public Sequence[] getSubVertexRanks()
         {
             return subVertexRanks;
         }
 
         @Override
-        public Ranks[] getVertexRanks()
+        public Sequence[] getVertexRanks()
         {
             return vertexRanks;
         }
 
         @Override
-        public Ranks[] getSideRanks()
+        public Sequence[] getSideRanks()
         {
             return sideRanks;
         }
@@ -326,9 +325,9 @@ public class QTM implements Grid
         return level;
     }
 
-    public Cell search(Ranks ranks)
+    public Cell search(Sequence sequence)
     {
-        return search(ranks.getRow(), ranks.getCol());
+        return search(sequence.getRow(), sequence.getCol());
     }
 
     public Cell search(int row, int column)
@@ -361,7 +360,7 @@ public class QTM implements Grid
     }
 
     @Override
-    public Ranks computeRanks(Cell cell)
+    public Sequence computeRanks(Cell cell)
     {
         if (cell.getGeocode().length() - 1 != getLevel())
         {
@@ -372,7 +371,7 @@ public class QTM implements Grid
         }
         int row = getRow(cell.getGeocode());
         int col = getColumn(cell.getGeocode(), row);
-        return new Ranks(row, col, cell.getGeocode());
+        return new Sequence(row, col, cell.getGeocode());
     }
 
     @Override

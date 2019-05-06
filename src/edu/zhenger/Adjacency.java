@@ -6,7 +6,7 @@
 
 package edu.zhenger;
 
-import edu.zhenger.model.Ranks;
+import edu.zhenger.model.Sequence;
 
 /**
  * @Author: WangZheng
@@ -17,17 +17,17 @@ import edu.zhenger.model.Ranks;
 public interface Adjacency
 {
 //    private Cell flat;
-//    private Ranks[] shareVertexCells;
-//    private Ranks[] shareSideCells;
+//    private Sequence[] shareVertexCells;
+//    private Sequence[] shareSideCells;
 
     Cell getFlat();
 
-    //void setShareVertexCells(Ranks[] shareVertexCells);
-    Ranks[] getSubVertexRanks();
+    //void setShareVertexCells(Sequence[] shareVertexCells);
+    Sequence[] getSubVertexRanks();
 
-    Ranks[] getVertexRanks();
+    Sequence[] getVertexRanks();
 
-    Ranks[] getSideRanks();
+    Sequence[] getSideRanks();
 
-    //void setShareSideCells(Ranks[] shareSideCells);
+    //void setShareSideCells(Sequence[] shareSideCells);
 }

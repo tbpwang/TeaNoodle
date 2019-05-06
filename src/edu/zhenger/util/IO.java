@@ -30,8 +30,8 @@ public class IO
         }
         checkPath(outPath);
 
-        List<Ranks> ranksList;
-        ranksList = new ArrayList<Ranks>();
+        List<Sequence> sequenceList;
+        sequenceList = new ArrayList<Sequence>();
 
 //        int level = grid.getLevel();
 
@@ -47,8 +47,8 @@ public class IO
                 for (Cell aCell : cells)
                 {
                     writer.write(aCell.toString());
-                    Ranks[] ranks = grid.adjoin(aCell).getSideRanks();
-                    for (Ranks rank : ranks)
+                    Sequence[] ranks = grid.adjoin(aCell).getSideRanks();
+                    for (Sequence rank : ranks)
                     {
                         if (rank.getRow() > grid.computeRanks(aCell).getRow()
                             || rank.getCol() > grid.computeRanks(aCell).getCol())
@@ -67,14 +67,14 @@ public class IO
 //                {
 //                    writer.write(aCell.toString());
 //
-//                    ranksList.add(aCell.computeRanks());
+//                    sequenceList.add(aCell.computeRanks());
 //
-//                    Ranks[] sideCellRanks = grid.adjoin(aCell).getSideRanks();
+//                    Sequence[] sideCellRanks = grid.adjoin(aCell).getSideRanks();
 //
-//                    for (Ranks r : sideCellRanks)
+//                    for (Sequence r : sideCellRanks)
 //                    {
 //                        boolean isOut = true;
-//                        for (Ranks aRanks : ranksList)
+//                        for (Sequence aRanks : sequenceList)
 //                        {
 //                            if (r.equals(aRanks))
 //                            {
@@ -99,7 +99,7 @@ public class IO
         }
         finally
         {
-            ranksList = null;
+            sequenceList = null;
             if (writer != null)
             {
                 try

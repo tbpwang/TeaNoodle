@@ -113,12 +113,12 @@ public class Trigon implements Cell
     }
 
 //    @Override
-//    public Subdivision subdivide()
+//    public Refinement subdivide()
 //    {
 //        return new Partition(this);
 //    }
 
-//    class Partition implements Subdivision
+//    class Partition implements Refinement
 //    {
 //        private Trigon cell;
 //
@@ -340,11 +340,11 @@ public class Trigon implements Cell
     }
 
 //    @Override
-//    public Ranks computeRanks()
+//    public Sequence computeRanks()
 //    {
 //        int row = getRow(geocode);
 //        int col = getColumn(geocode, row);
-//        return new Ranks(row, col, this.geocode);
+//        return new Sequence(row, col, this.geocode);
 //    }
 
     @Override

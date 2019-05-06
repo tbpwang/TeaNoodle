@@ -6,6 +6,7 @@
 
 package edu.zhenger.model;
 
+import edu.zhenger.Cell;
 import edu.zhenger.util.Term;
 import gov.nasa.worldwind.geom.*;
 import gov.nasa.worldwind.render.*;
@@ -17,7 +18,7 @@ import java.util.Arrays;
  * @Function: 修改编码方法，用于任意球面三角形的面积计算 剖分方法为：四孔均分弧法(ClassⅠMid-Arcs)
  * @Date: 2018/12/16
  */
-public class SpTriangle //extends AreaMeasurer
+public class SpTriangle //implements Cell
 {
     private SpTriangle[] children;
 
@@ -149,6 +150,10 @@ public class SpTriangle //extends AreaMeasurer
 
     public static class Area
     {
+        public static double computer()
+        {
+            return 0;
+        }
         public static double computer(LatLon top, LatLon left, LatLon right)
         {
             return computer(top, left, right, 1.0);

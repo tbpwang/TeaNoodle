@@ -6,11 +6,17 @@
 
 package edu.joel;
 
-import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.avlist.AVKey;
+import gov.nasa.worldwind.geom.*;
+import gov.nasa.worldwind.layers.RenderableLayer;
+import gov.nasa.worldwind.render.*;
 import gov.nasa.worldwind.util.Logging;
 import sun.rmi.runtime.Log;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author Zheng WANG
@@ -18,7 +24,7 @@ import java.util.*;
  * @description 闭合基本单元格，attributes of a cell
  * @parameter 构成单元格的顶点（初始顶点和终结顶点相同），地理编码ID
  */
-public abstract class Cell implements Area, Refinement
+public abstract class Cell extends SurfacePolygon implements Area, Refinement
 {
     // domain
     //private Globe globe;
@@ -37,7 +43,7 @@ public abstract class Cell implements Area, Refinement
     private String ID;
 //    private boolean flag;
 
-    private List<Neighbor> neighborList;
+    private List<Neighbor> neighbors;
 
     public Cell(Iterable<? extends LatLon> locations, String ID, int level)
     {
@@ -54,6 +60,8 @@ public abstract class Cell implements Area, Refinement
         {
             geoVertices.add(point);
         }
+
+        shape = geoVertices.size() - 1;
 
         if (!geoVertices.get(0).equals(geoVertices.get(shape)))
         {
@@ -120,9 +128,9 @@ public abstract class Cell implements Area, Refinement
         this.level = level;
     }
 
-    public List<Neighbor> getNeighborList()
+    public List<Neighbor> getNeighbors()
     {
-        return neighborList;
+        return neighbors;
     }
 
     public void setNeighbor(Neighbor neighbor)
@@ -131,49 +139,20 @@ public abstract class Cell implements Area, Refinement
         {
             return;
         }
-        if (getNeighborList() == null)
+        if (getNeighbors() == null)
         {
-            neighborList = new ArrayList<>();
+            neighbors = new ArrayList<>();
         }
-        neighborList.add(neighbor);
+        neighbors.add(neighbor);
     }
 
-    public double getUnitArea()
-    {
-        int length = geoVertices.size();
-        double excess = -Math.PI * (length - 1 - 2);
-        LatLon startPoint, midPoint, endPoint;
-        // 临时三角形的周长p、以及角度ABC对应的边abc
-        double p, a, b, c;
-        for (int i = 0; i < length - 1; i++)
-        {
-            if (i == 0)
-            {
-                startPoint = geoVertices.get(length - 2);
-                midPoint = geoVertices.get(0);
-                endPoint = geoVertices.get(1);
-            }
-            else
-            {
-                startPoint = geoVertices.get(i - 1);
-                midPoint = geoVertices.get(i);
-                endPoint = geoVertices.get(i + 1);
-            }
-            c = LatLon.greatCircleDistance(startPoint, midPoint).radians;
-            b = LatLon.greatCircleDistance(endPoint, midPoint).radians;
-            a = LatLon.greatCircleDistance(startPoint, endPoint).radians;
-            p = (a + b + c) / 2;
-            excess += 2 * Math.asin(Math.sqrt(Math.sin(p - c) * Math.sin(p - b) / Math.sin(c) / Math.sin(b)));
-        }
-        return excess;
-    }
+    public abstract double getUnitArea();
 
-    public double computeArea()
-    {
-        return getUnitArea() * DGGS.getGlobe().getRadius() * DGGS.getGlobe().getRadius();
-    }
+    public abstract double computeArea();
 
     public abstract Cell[] refine();
+
+    public abstract Path[] renderPath();
 
     public int getShape()
     {
@@ -231,16 +210,15 @@ public abstract class Cell implements Area, Refinement
     {
         StringBuilder locations = new StringBuilder();
 
-        for (int i = 0; i < geoVertices.size() - 2; i++)
+        for (LatLon ll : geoVertices)
         {
-            locations.append(geoVertices.get(i).toString());
+            locations.append(ll.toString());
         }
 
         return "Cell{" +
-            "shape=" + shape + System.lineSeparator() +
-            "geoVertices=" + locations.toString() + System.lineSeparator() +
-            "center=" + center.toString() + System.lineSeparator() +
-            "ID='" + ID + '\'' +
+            "ID = '" + ID + '\'' +
+            ", shape = " + shape +
+            ", geoVertices = " + locations.toString() +
             '}';
     }
 }

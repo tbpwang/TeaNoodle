@@ -8,6 +8,9 @@ package edu.joel;
 
 import gov.nasa.worldwind.geom.*;
 import gov.nasa.worldwind.globes.*;
+import gov.nasa.worldwind.render.*;
+
+import java.awt.*;
 
 /**
  * @author Zheng WANG
@@ -50,5 +53,29 @@ public final class DGGS
     public static Globe getEarthFlat()
     {
         return new EarthFlat();
+    }
+
+    public static ShapeAttributes polygonAttribute()
+    {
+        ShapeAttributes attributes = new BasicShapeAttributes();
+
+        // for Path
+        attributes.setOutlineMaterial(new Material(new Color(20, 120, 20)));
+
+        // for Polygon
+        attributes.setInteriorMaterial(new Material(new Color(20, 100, 20)));
+        attributes.setInteriorOpacity(0.008);
+
+        return attributes;
+    }
+
+    public static ShapeAttributes pathAttribute()
+    {
+        ShapeAttributes attributes = new BasicShapeAttributes();
+        // for Path
+        attributes.setOutlineMaterial(new Material(new Color(20, 150, 20)));
+        attributes.setOutlineWidth(2.0);
+
+        return attributes;
     }
 }

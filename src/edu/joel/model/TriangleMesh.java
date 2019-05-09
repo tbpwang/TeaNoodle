@@ -24,8 +24,15 @@ public class TriangleMesh extends Mesh
     }
 
     @Override
-    public void adjoin(Cell cell, Cell nearCell)
+    public void adjoin(Object cell, Object nearCell)
     {
+        if (!cell.getClass().getSuperclass().getName().equals(Cell.class.getName())
+            || !nearCell.getClass().getSuperclass().getName().equals(Cell.class.getName()))
+        {
+            String message = Logging.getMessage("parameterError.TypeIsDifference");
+            Logging.logger().severe(message);
+            throw new IllegalArgumentException(message);
+        }
         int[] thisCell = find(cell);
         int[] rowCol = find(nearCell);
 
@@ -45,12 +52,12 @@ public class TriangleMesh extends Mesh
         int nearVertexOrEdge = -1;
 
         LatLon top, left, right, cellTop, cellLeft, cellRight;
-        top = cell.getGeoVertices().get(0);
-        left = cell.getGeoVertices().get(1);
-        right = cell.getGeoVertices().get(2);
-        cellTop = nearCell.getGeoVertices().get(0);
-        cellLeft = nearCell.getGeoVertices().get(1);
-        cellRight = nearCell.getGeoVertices().get(2);
+        top = ((Cell) cell).getGeoVertices().get(0);
+        left = ((Cell) cell).getGeoVertices().get(1);
+        right = ((Cell) cell).getGeoVertices().get(2);
+        cellTop = ((Cell) cell).getGeoVertices().get(0);
+        cellLeft = ((Cell) cell).getGeoVertices().get(1);
+        cellRight = ((Cell) cell).getGeoVertices().get(2);
 
         if (top.equals(cellTop))
         {
@@ -90,7 +97,7 @@ public class TriangleMesh extends Mesh
 
         if (nearVertexOrEdge != -1)
         {
-            cell.setNeighbor(new Neighbor(nearCell, rowCol[0], rowCol[1], nearVertexOrEdge));
+            ((Cell) cell).setNeighbor(new Neighbor((Cell) nearCell, rowCol[0], rowCol[1], nearVertexOrEdge));
         }
     }
 }

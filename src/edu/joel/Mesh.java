@@ -21,24 +21,34 @@ import java.util.*;
 public abstract class Mesh implements Serializable
 {
     private String pathType = AVKey.GREAT_CIRCLE;
-    private List<List<Node>> graph;
+    private List<List<Node>> nodes;
     //    private List<LatLon> vertices;
     private int level;
 
-    private class Node
+    public class Node
     {
-        private Cell cell;
+        private Object cell;
         private boolean flag;
 
-        Node(Cell cell)
+        private Node(Object cell)
         {
             this(cell, false);
         }
 
-        Node(Cell cell, boolean flag)
+        private Node(Object cell, boolean flag)
         {
             this.cell = cell;
             this.flag = flag;
+        }
+
+        public Object getCell()
+        {
+            return cell;
+        }
+
+        public boolean isFlag()
+        {
+            return flag;
         }
     }
 
@@ -49,7 +59,7 @@ public abstract class Mesh implements Serializable
 
     public Mesh(int level)
     {
-        graph = new ArrayList<>();
+        nodes = new ArrayList<>();
         this.level = level;
     }
 
@@ -69,7 +79,7 @@ public abstract class Mesh implements Serializable
         this.level = level;
     }
 
-    public void add(Cell cell, int i, int j, boolean isFlag)
+    public void add(Object cell, int i, int j, boolean isFlag)
     {
         if (cell == null)
         {
@@ -77,58 +87,118 @@ public abstract class Mesh implements Serializable
             Logging.logger().severe(message);
             return;
         }
-        if (level != -1 && cell.getLevel() != -1 && level != cell.getLevel())
-        {
-            String message = Logging.getMessage("inputError.LevelMisMatches");
-            Logging.logger().severe(message);
-            throw new InputMismatchException(message);
-        }
+//        if (level != -1 && cell.getLevel() != -1 && level != cell.getLevel())
+//        {
+//            String message = Logging.getMessage("inputError.LevelMisMatches");
+//            Logging.logger().severe(message);
+//            throw new InputMismatchException(message);
+//        }
         List<Node> list;
-        if (graph.size() < i)
+        if (i == -1 && j == -1)
         {
-            list = new ArrayList<>();
-            list.add(j, new Node(cell, isFlag));
-            graph.add(i, list);
-        }
-        else
-        {
-            if (cell.equals(graph.get(i).get(j).cell))
+            if (nodes.size() > 0)
             {
-                String message = Logging.getMessage("duplicateValue.ValueExists");
-                Logging.logger().severe(message);
+                list = nodes.get(0);
             }
             else
             {
-                graph.get(i).remove(j);
-                graph.get(i).add(j, new Node(cell, isFlag));
+                list = new ArrayList<>();
+            }
+            list.add(new Node(cell, isFlag));
+            nodes.add(list);
+        }
+        else
+        {
+            int il = nodes.size();
+            if (il < i)
+            {
+                list = new ArrayList<>();
+                for (int k = 0; k < j; k++)
+                {
+                    if (k == j - 1)
+                    {
+                        list.add(new Node(cell, isFlag));
+                    }
+                    else
+                    {
+                        list.add(null);
+                    }
+                }
+                for (int k = 0; k < i - il; k++)
+                {
+                    if (k == i - il - 1)
+                    {
+                        nodes.add(list);
+                    }
+                    else
+                    {
+                        nodes.add(null);
+                    }
+                }
+            }
+            else
+            {
+                // il >= i-1
+                int jl = nodes.get(i - 1).size();
+                if (jl < j)
+                {
+                    for (int k = 0; k < j - jl; k++)
+                    {
+                        if (k == j - jl - 1)
+                        {
+                            nodes.get(i - 1).add(new Node(cell, isFlag));
+                        }
+                        else
+                        {
+                            nodes.get(i - 1).add(null);
+                        }
+                    }
+                }
+                else
+                {
+                    nodes.get(i - 1).set(j - 1, new Node(cell, isFlag));
+                }
             }
         }
     }
 
-    public void add(Cell cell, int i, int j)
+    public void add(Object cell, int i, int j)
     {
         add(cell, i, j, false);
     }
 
+    public void add(Object cell)
+    {
+        add(cell, -1, -1);
+    }
+
     //    private boolean equals(Cell cell)
 //    {
-//        while (graph.iterator().hasNext())
+//        while (nodes.iterator().hasNext())
 //        {
-//            while (graph.iterator().next().iterator().hasNext())
+//            while (nodes.iterator().next().iterator().hasNext())
 //            {
-//                return graph.iterator().next().iterator().next().cell.equals(cell);
+//                return nodes.iterator().next().iterator().next().cell.equals(cell);
 //            }
 //        }
 //    }
-    public void setFlag(Cell cell, boolean flag)
+
+    public List<List<Node>> getNodes()
     {
-        while (graph.iterator().hasNext())
+        return nodes;
+    }
+
+    public void setFlag(Object cell, boolean flag)
+    {
+        while (nodes.iterator().hasNext())
         {
-            while (graph.iterator().next().iterator().hasNext())
+            List<Node> rowList = nodes.iterator().next();
+            while (rowList.iterator().hasNext())
             {
-                if (graph.iterator().next().iterator().next().cell.equals(cell))
+                Node node = rowList.iterator().next();
+                if (node.cell.equals(cell))
                 {
-                    graph.iterator().next().iterator().next().flag = flag;
+                    node.flag = flag;
                 }
             }
         }
@@ -137,13 +207,13 @@ public abstract class Mesh implements Serializable
 //   邻接关系不能移除
 //    public void remove(int i, int j)
 //    {
-//        if (graph.size() >= i)
+//        if (nodes.size() >= i)
 //        {
-//            graph.get(i).remove(j);
+//            nodes.get(i).remove(j);
 //        }
 //    }
 
-    public int[] find(Cell cell)
+    public int[] find(Object cell)
     {
         int[] result = new int[2];
         result[0] = -1;
@@ -156,18 +226,18 @@ public abstract class Mesh implements Serializable
         }
         int row = 0, column = 0;
         boolean isFind = false;
-        while (graph.iterator().hasNext() && !isFind)
+        while (nodes.iterator().hasNext() && !isFind)
         {
-            while (graph.get(row).iterator().hasNext() && !isFind)
+            while (nodes.get(row).iterator().hasNext() && !isFind)
             {
-                if (cell.equals(graph.get(row).iterator().next()))
+                if (cell.equals(nodes.get(row).iterator().next()))
                 {
                     isFind = true;
                 }
                 column++;
             }
             row++;
-            graph.iterator().next();
+            nodes.iterator().next();
         }
 
         row--;
@@ -179,7 +249,7 @@ public abstract class Mesh implements Serializable
         return result;
     }
 
-    public abstract void adjoin(Cell cell, Cell nearCell);
+    public abstract void adjoin(Object cell, Object nearCell);
 
     public String getPathType()
     {
@@ -189,5 +259,23 @@ public abstract class Mesh implements Serializable
     protected void setPathType(String pathType)
     {
         this.pathType = pathType;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder stringNodes = new StringBuilder();
+        for (List<Node> nodeList : nodes)
+        {
+            for (Node node : nodeList)
+            {
+                stringNodes.append(node.getCell().toString()).append(System.lineSeparator());
+            }
+        }
+        return "Mesh{" +
+            "level = " + level +
+            ", pathType = '" + pathType + '\''  +
+            ", nodes = " + System.lineSeparator() + stringNodes.toString() +
+            '}';
     }
 }

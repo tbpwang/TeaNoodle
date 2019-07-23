@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package edu.joel;
+package edu.joel.io;
 
 import gov.nasa.worldwind.geom.*;
 import gov.nasa.worldwind.globes.*;
@@ -18,12 +18,16 @@ import java.awt.*;
  * @description superclass class
  * @parameter  return Sphere(Geometry) and Globe(Globe)
  */
-public final class DGGS
+public final class Constant
 {
     private static Vec4 center = Vec4.ZERO;
     // 长半轴a＝6378137(m), Earth.WGS84_EQUATORIAL_RADIUS
     // 与CGCS2000或WGS84相同表面积的球半径近似为：R2= 6371007.18092(m)
     private static double radius = 6371007.18092;
+
+    public static int NEIGHBOR_TYPE_EDGE = 1;
+
+    public static int NEIGHBOR_TYPE_VERTEX = 0;
 
     public static Sphere getSphere()
     {
@@ -55,7 +59,7 @@ public final class DGGS
         return new EarthFlat();
     }
 
-    public static ShapeAttributes polygonAttribute()
+    public static ShapeAttributes defaultPolygonAttribute()
     {
         ShapeAttributes attributes = new BasicShapeAttributes();
 
@@ -69,7 +73,7 @@ public final class DGGS
         return attributes;
     }
 
-    public static ShapeAttributes pathAttribute()
+    public static ShapeAttributes defaultPathAttribute()
     {
         ShapeAttributes attributes = new BasicShapeAttributes();
         // for Path

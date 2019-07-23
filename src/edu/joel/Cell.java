@@ -6,17 +6,12 @@
 
 package edu.joel;
 
-import gov.nasa.worldwind.WorldWind;
-import gov.nasa.worldwind.avlist.AVKey;
-import gov.nasa.worldwind.geom.*;
-import gov.nasa.worldwind.layers.RenderableLayer;
+import edu.joel.io.Constant;
+import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.render.*;
 import gov.nasa.worldwind.util.Logging;
-import sun.rmi.runtime.Log;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * @author Zheng WANG
@@ -24,10 +19,8 @@ import java.util.List;
  * @description 闭合基本单元格，attributes of a cell
  * @parameter 构成单元格的顶点（初始顶点和终结顶点相同），地理编码ID
  */
-public abstract class Cell extends SurfacePolygon implements Area, Refinement
+public abstract class Cell extends DGG implements Area, Refinement
 {
-    // domain
-    //private Globe globe;
 
     //    // 表示单元格的基本形状取值为：
 //    // "TRI"(3),"QUA"(4),"HEX"(6)....
@@ -40,12 +33,9 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
     private LatLon center;
 
     // Geo-coding
-    private String ID;
-//    private boolean flag;
+    private Geocode geocode;
 
-    private List<Neighbor> neighbors;
-
-    public Cell(Iterable<? extends LatLon> locations, String ID, int level)
+    public Cell(Iterable<? extends LatLon> locations, String ID)
     {
         if (locations == null)
         {
@@ -55,8 +45,7 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
         }
         geoVertices = new ArrayList<>();
 
-        for (LatLon point :
-            locations)
+        for (LatLon point : locations)
         {
             geoVertices.add(point);
         }
@@ -76,18 +65,12 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
             throw new IllegalArgumentException(message);
         }
         //this.globe = DGGS.getGlobe();
-        center = LatLon.getCenter(DGGS.getGlobe(), locations);
-        this.ID = ID;
-        this.level = level;
-//        flag = false;
+        center = LatLon.getCenter(Constant.getGlobe(), locations);
+        geocode = new Geocode(ID);
+        this.level = ID.length() - 1;
     }
 
-    public Cell(Iterable<? extends LatLon> locations, String ID)
-    {
-        this(locations, ID, -1);
-    }
-
-    public Cell(LatLon top, LatLon left, LatLon right, String ID, int level)
+    public Cell(LatLon top, LatLon left, LatLon right, String ID)
     {
         if (top == null || left == null || right == null)
         {
@@ -100,16 +83,10 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
         geoVertices.add(left);
         geoVertices.add(right);
         geoVertices.add(top);
-        center = LatLon.getCenter(geoVertices);
+        center = LatLon.getCenter(Constant.getGlobe(), geoVertices);
         shape = 3;
-        this.ID = ID;
-        this.level = level;
-//        flag = false;
-    }
-
-    public Cell(LatLon top, LatLon left, LatLon right, String ID)
-    {
-        this(top, left, right, ID, -1);
+        geocode = new Geocode(ID);
+        this.level = ID.length() - 1;
     }
 
     public int getLevel()
@@ -117,38 +94,9 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
         return level;
     }
 
-    public void setLevel(int level)
-    {
-        if (this.level != -1)
-        {
-            String message = Logging.getMessage("unchangeableValue.ValueIsUnchangeable");
-            Logging.logger().severe(message);
-            return;
-        }
-        this.level = level;
-    }
-
-    public List<Neighbor> getNeighbors()
-    {
-        return neighbors;
-    }
-
-    public void setNeighbor(Neighbor neighbor)
-    {
-        if (neighbor == null)
-        {
-            return;
-        }
-        if (getNeighbors() == null)
-        {
-            neighbors = new ArrayList<>();
-        }
-        neighbors.add(neighbor);
-    }
-
     public abstract double getUnitArea();
 
-    public abstract double computeArea();
+//    public abstract double computeArea();
 
     public abstract Cell[] refine();
 
@@ -164,14 +112,42 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
         return center;
     }
 
-    public String getID()
+    public Geocode getGeocode()
     {
-        return ID;
+        return geocode;
     }
 
     public List<LatLon> getGeoVertices()
     {
         return geoVertices;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(geoVertices, geocode.getID(), level);
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder locations = new StringBuilder();
+
+        int counter = 1;
+        int total = geoVertices.size();
+        for (LatLon ll : geoVertices)
+        {
+            if (counter++ != total)
+            {
+                locations.append(ll.toString());
+            }
+        }
+
+        return "{" +
+            getGeocode().toString() +
+            ", " + shape +
+            ", " + locations.toString() +
+            '}';
     }
 
     @Override
@@ -182,43 +158,31 @@ public abstract class Cell extends SurfacePolygon implements Area, Refinement
         if (o == null || getClass() != o.getClass())
             return false;
         Cell cell = (Cell) o;
+//        return shape == cell.shape &&
+//            level == cell.level &&
+//            Objects.equals(geoVertices, cell.geoVertices) &&
+//            Objects.equals(center, cell.center) &&
+//            Objects.equals(geocode, cell.geocode);
+//
+//        if (this == o)
+//            return true;
+//        if (o == null || getClass() != o.getClass())
+//            return false;
+//        Cell cell = (Cell) o;
         boolean isEqual = true;
-        for (int i = 0; i < geoVertices.size(); i++)
+        for (int i = 0; i < getGeoVertices().size(); i++)
         {
 //            geoVertices.get(i).equals(cell.geoVertices.get(i));
-            if (!LatLon.equals(geoVertices.get(i), cell.geoVertices.get(i)))
+            if (!LatLon.equals(getGeoVertices().get(i), cell.getGeoVertices().get(i)))
             {
                 isEqual = false;
                 break;
             }
         }
-        if (cell.level != -1 && level != -1 && cell.level != level)
-        {
-            isEqual = false;
-        }
-        return isEqual && ID.equals(cell.ID);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(geoVertices, ID, level);
-    }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder locations = new StringBuilder();
-
-        for (LatLon ll : geoVertices)
-        {
-            locations.append(ll.toString());
-        }
-
-        return "Cell{" +
-            "ID = '" + ID + '\'' +
-            ", shape = " + shape +
-            ", geoVertices = " + locations.toString() +
-            '}';
+//        if (cell.level != -1 && level != -1 && cell.level != level)
+//        {
+//            isEqual = false;
+//        }
+        return isEqual && geocode.getID().equals(cell.geocode.getID());
     }
 }

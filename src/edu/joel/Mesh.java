@@ -6,8 +6,7 @@
 
 package edu.joel;
 
-import gov.nasa.worldwind.avlist.AVKey;
-import gov.nasa.worldwind.util.Logging;
+import edu.joel.io.Constant;
 
 import java.io.Serializable;
 import java.util.*;
@@ -16,32 +15,37 @@ import java.util.*;
  * @author Zheng WANG
  * @create 2019/5/6 12:41
  * @description
- * @parameter
  */
 public abstract class Mesh implements Serializable
 {
-    private String pathType = AVKey.GREAT_CIRCLE;
-    private List<List<Node>> nodes;
-    //    private List<LatLon> vertices;
+    private List<Node> nodes;
     private int level;
+    private boolean nodeSorted;
 
     public class Node
     {
-        private Object cell;
+        private DGG cell;
         private boolean flag;
+        private List<Neighbor> neighborList;
 
-        private Node(Object cell)
+        private Node()
+        {
+            this(null);
+        }
+
+        private Node(DGG cell)
         {
             this(cell, false);
         }
 
-        private Node(Object cell, boolean flag)
+        private Node(DGG cell, boolean flag)
         {
             this.cell = cell;
             this.flag = flag;
+//            neighborList = null;
         }
 
-        public Object getCell()
+        public DGG getCell()
         {
             return cell;
         }
@@ -49,6 +53,135 @@ public abstract class Mesh implements Serializable
         public boolean isFlag()
         {
             return flag;
+        }
+
+        private void setFlag(boolean flag)
+        {
+            this.flag = flag;
+        }
+
+        public List<Neighbor> getNeighborList()
+        {
+            if (neighborList == null)
+                neighborList = new ArrayList<>();
+            return neighborList;
+        }
+
+        public Neighbor asNeighbor()
+        {
+//            return new Neighbor();
+            return new Neighbor(this);
+        }
+
+        public Neighbor asNeighbor(int nodeType)
+        {
+//            return new Neighbor();
+            return new Neighbor(this, nodeType);
+        }
+
+        public void addNeighbor(Neighbor neighbor)
+        {
+            if (neighbor != null)
+                this.getNeighborList().add(neighbor);
+        }
+
+//        public void addNeighbor(Node neighbor, int neighborType)
+//        {
+//            Neighbor n = asNeighbor();
+////                n.asNeighbour(neighbor);
+////                n.setType(type);
+////                n.asNeighbour(neighbor,neighborType);
+//            n.
+//        }
+
+        public void setNeighborList(List<Neighbor> neighborList)
+        {
+            if (neighborList != null)
+            {
+                this.neighborList = neighborList;
+            }
+        }
+    }
+
+    public class Neighbor
+    {
+        //    private DGG host;
+        private Node node;
+        //        private Geocode neighborGeocode;
+        private int type;
+
+//        private Neighbor()
+//        {
+//            this(null);
+//        }
+
+        private Neighbor(Node node)
+        {
+            this(node, -1);
+        }
+
+        private Neighbor(Node node, int type)
+        {
+            if (node != null)
+            {
+                this.node = node;
+            }
+            else
+            {
+                this.node = new Node();
+            }
+            if (type == Constant.NEIGHBOR_TYPE_EDGE || type == Constant.NEIGHBOR_TYPE_VERTEX)
+            {
+                this.type = type;
+            }
+            else
+            {
+                this.type = -1;
+            }
+        }
+
+        public Node getNode()
+        {
+            return node;
+        }
+
+//        public void setNode(Node node)
+//        {
+//            this.node = node;
+//        }
+//
+//        public void setNode(Node node, int type)
+//        {
+//            setNode(node);
+//            setType(type);
+//        }
+
+        public int getType()
+        {
+            // DGGS.NEIGHBOR_TYPE_EDGE = 1
+            // DGGS.NEIGHBOR_TYPE_VERTEX = 0
+            // Error = -1
+            return type;
+        }
+
+        public void setType(int neighborType)
+        {
+//            this.type = neighborType;
+            if (type == Constant.NEIGHBOR_TYPE_VERTEX || type == Constant.NEIGHBOR_TYPE_EDGE)
+            {
+                this.type = neighborType;
+            }
+            else
+            {
+                this.type = -1;
+            }
+        }
+
+        @Override
+        public String toString()
+        {
+            return getNode().getCell().getGeocode().toString() +
+                ", \'" + (type == 1 ? "Ed" : type == 0 ? "Vt" : "Un") + "\'";
         }
     }
 
@@ -61,6 +194,18 @@ public abstract class Mesh implements Serializable
     {
         nodes = new ArrayList<>();
         this.level = level;
+        nodeSorted = false;
+//        pathType = AVKey.GREAT_CIRCLE;
+    }
+
+    private boolean isNodeSorted()
+    {
+        return nodeSorted;
+    }
+
+    private void setNodeSorted()
+    {
+        nodeSorted = true;
     }
 
     public int getLevel()
@@ -68,213 +213,121 @@ public abstract class Mesh implements Serializable
         return level;
     }
 
-    public void setLevel(int level)
+    public void setNodes(List<Node> nodes)
     {
-        if (this.level != -1)
+        if (nodes != null)
         {
-            String message = Logging.getMessage("unchangeableValue.ValueIsUnchangeable");
-            Logging.logger().severe(message);
-            return;
+            this.nodes = nodes;
         }
-        this.level = level;
     }
 
-    public void add(Object cell, int i, int j, boolean isFlag)
+    public void addNode(DGG cell)
     {
-        if (cell == null)
+        //Node node
+        if (cell.getLevel() == this.getLevel())
         {
-            String message = Logging.getMessage("nullValue.CellIsNull");
-            Logging.logger().severe(message);
-            return;
+            nodes.add(new Node(cell));
         }
-//        if (level != -1 && cell.getLevel() != -1 && level != cell.getLevel())
-//        {
-//            String message = Logging.getMessage("inputError.LevelMisMatches");
-//            Logging.logger().severe(message);
-//            throw new InputMismatchException(message);
-//        }
-        List<Node> list;
-        if (i == -1 && j == -1)
+    }
+
+    public void addNode(Node node)
+    {
+        if (node.getCell().getLevel() == this.getLevel())
         {
-            if (nodes.size() > 0)
-            {
-                list = nodes.get(0);
-            }
-            else
-            {
-                list = new ArrayList<>();
-            }
-            list.add(new Node(cell, isFlag));
-            nodes.add(list);
+            nodes.add(node);
         }
-        else
+    }
+
+    public Node search(int row, int column, String baseID)
+    {
+        // 此处的查找算法有待优化，以便提高查找速度
+        List<Node> temp = getNodes();
+//        int listSize = temp.size();
+        for (Node node : temp)
         {
-            int il = nodes.size();
-            if (il < i)
+            Geocode geocode = node.getCell().getGeocode();
+            String base = geocode.getBaseID();
+            if (base.equals(baseID) && geocode.getRow() == row && geocode.getColumn() == column)
             {
-                list = new ArrayList<>();
-                for (int k = 0; k < j; k++)
-                {
-                    if (k == j - 1)
-                    {
-                        list.add(new Node(cell, isFlag));
-                    }
-                    else
-                    {
-                        list.add(null);
-                    }
-                }
-                for (int k = 0; k < i - il; k++)
-                {
-                    if (k == i - il - 1)
-                    {
-                        nodes.add(list);
-                    }
-                    else
-                    {
-                        nodes.add(null);
-                    }
-                }
+                return node;
             }
-            else
+        }
+        // 新查找方法
+        // TODO
+
+        return null;
+    }
+
+    public Node search(Geocode geocode)
+    {
+        for (int i = 0; i < getNodes().size(); i++)
+        {
+            if (getNodes().get(i).getCell().getGeocode().equals(geocode))
             {
-                // il >= i-1
-                int jl = nodes.get(i - 1).size();
-                if (jl < j)
-                {
-                    for (int k = 0; k < j - jl; k++)
+                return getNodes().get(i);
+            }
+        }
+        return null;
+    }
+
+    public List<Node> getNodes()
+    {
+        if (nodes != null)
+        {
+            if (!isNodeSorted())
+            {
+                nodes.sort((o1, o2) -> {
+                    Geocode g1, g2;
+                    g1 = o1.getCell().getGeocode();
+                    g2 = o2.getCell().getGeocode();
+                    if (g1.getBaseID().equals(g2.getBaseID()))
                     {
-                        if (k == j - jl - 1)
+                        if (g1.getRow() == g2.getRow())
                         {
-                            nodes.get(i - 1).add(new Node(cell, isFlag));
+                            return g1.getColumn() - g2.getColumn();
                         }
-                        else
-                        {
-                            nodes.get(i - 1).add(null);
-                        }
+                        return g1.getRow() - g2.getRow();
                     }
-                }
-                else
-                {
-                    nodes.get(i - 1).set(j - 1, new Node(cell, isFlag));
-                }
+                    return g1.getBaseID().compareTo(g2.getBaseID());
+                });
+                setNodeSorted();
             }
+            return nodes;
+        }
+        return null;
+    }
+
+    public void setFlag(DGG cell, boolean flag)
+    {
+        Node node = search(cell.getGeocode());
+        if (node != null)
+        {
+            node.setFlag(flag);
         }
     }
 
-    public void add(Object cell, int i, int j)
-    {
-        add(cell, i, j, false);
-    }
-
-    public void add(Object cell)
-    {
-        add(cell, -1, -1);
-    }
-
-    //    private boolean equals(Cell cell)
+//    public String getPathType()
 //    {
-//        while (nodes.iterator().hasNext())
-//        {
-//            while (nodes.iterator().next().iterator().hasNext())
-//            {
-//                return nodes.iterator().next().iterator().next().cell.equals(cell);
-//            }
-//        }
+//        return pathType;
 //    }
-
-    public List<List<Node>> getNodes()
-    {
-        return nodes;
-    }
-
-    public void setFlag(Object cell, boolean flag)
-    {
-        while (nodes.iterator().hasNext())
-        {
-            List<Node> rowList = nodes.iterator().next();
-            while (rowList.iterator().hasNext())
-            {
-                Node node = rowList.iterator().next();
-                if (node.cell.equals(cell))
-                {
-                    node.flag = flag;
-                }
-            }
-        }
-    }
-
-//   邻接关系不能移除
-//    public void remove(int i, int j)
+//
+//    protected void setPathType(String pathType)
 //    {
-//        if (nodes.size() >= i)
-//        {
-//            nodes.get(i).remove(j);
-//        }
+//        this.pathType = pathType;
 //    }
-
-    public int[] find(Object cell)
-    {
-        int[] result = new int[2];
-        result[0] = -1;
-        result[1] = -1;
-        if (cell == null)
-        {
-            String message = Logging.getMessage("nullValue.CellIsNull");
-            Logging.logger().severe(message);
-            return result;
-        }
-        int row = 0, column = 0;
-        boolean isFind = false;
-        while (nodes.iterator().hasNext() && !isFind)
-        {
-            while (nodes.get(row).iterator().hasNext() && !isFind)
-            {
-                if (cell.equals(nodes.get(row).iterator().next()))
-                {
-                    isFind = true;
-                }
-                column++;
-            }
-            row++;
-            nodes.iterator().next();
-        }
-
-        row--;
-        column--;
-
-        result[0] = row;
-        result[1] = column;
-
-        return result;
-    }
-
-    public abstract void adjoin(Object cell, Object nearCell);
-
-    public String getPathType()
-    {
-        return pathType;
-    }
-
-    protected void setPathType(String pathType)
-    {
-        this.pathType = pathType;
-    }
 
     @Override
     public String toString()
     {
         StringBuilder stringNodes = new StringBuilder();
-        for (List<Node> nodeList : nodes)
+
+        for (Node node : nodes)
         {
-            for (Node node : nodeList)
-            {
-                stringNodes.append(node.getCell().toString()).append(System.lineSeparator());
-            }
+            stringNodes.append(node.getCell().toString()).append(System.lineSeparator());
         }
+
         return "Mesh{" +
             "level = " + level +
-            ", pathType = '" + pathType + '\''  +
             ", nodes = " + System.lineSeparator() + stringNodes.toString() +
             '}';
     }

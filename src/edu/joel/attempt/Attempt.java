@@ -7,7 +7,7 @@
 package edu.joel.attempt;
 
 import edu.joel.*;
-import edu.joel.model.*;
+import edu.joel.model.MiddleArcSurfaceTriangle;
 import gov.nasa.worldwind.geom.LatLon;
 
 import java.util.*;
@@ -22,95 +22,72 @@ public class Attempt
 {
     public static void main(String[] args)
     {
-        LatLon p1,p2,p3,p4;
-        p1 = LatLon.fromDegrees(90,0);
-        p2 = LatLon.fromDegrees(0,0);
-        p3 = LatLon.fromDegrees(0,90);
-        List<LatLon> list = new ArrayList<>();
-        list.add(p1);
-        list.add(p2);
-        list.add(p3);
+//        System.out.println(Constant.getGlobe().getRadius());
+        LatLon p1, p2, p3;
+        p1 = LatLon.fromDegrees(90, 0);
+        p2 = LatLon.fromDegrees(0, 0);
+        p3 = LatLon.fromDegrees(0, 90);
+//        List<LatLon> list = new ArrayList<>();
+//        list.add(p1);
+//        list.add(p2);
+//        list.add(p3);
 
-//        Cell triangle = new MiddleArcTriangle(list,"A");
-//        Cell[] sub = triangle.refine();
-        ZhaoQTM triangle = new ZhaoQTM(list,"A");
-        ZhaoQTM[] sub = triangle.refine();
+        MiddleArcSurfaceTriangle triangle = new MiddleArcSurfaceTriangle(p1, p2, p3, new Geocode("A"));
+        //MiddleArcTriangle[] sub = triangle.binaryRefine();
+//        ZhaoQTM triangle = new ZhaoQTM(list,new Geocode("A"));
+//        ZhaoQTM[] sub = triangle.binaryRefine();
+        int level = 2;
 
-//        for (int i = 0; i < 10; i++)
-//        {
-//            if (i==4)
-//            {
-//                list.add(i,p1);
-//                continue;
-//            }
-//            if (i==6)
-//            {
-//                list.add(i,p2);
-//                continue;
-//            }
-//            if (i==8)
-//            {
-//                list.add(i,p3);
-//                continue;
-//            }
-//            list.add(null);
-//        }
-//        list.set(0,p1);
-//        list.add(1,p2);
+        List<MiddleArcSurfaceTriangle> triangleList;
+        triangleList = new ArrayList<>(Collections.singletonList(triangle));
+        refineTriangle(level, triangleList);
 
-        System.out.println("Size: ");
-        System.out.println(list.size());
-        System.out.println(Arrays.toString(list.toArray()));
+        triangleList.sort((o1, o2) -> {
+            int diff1 = o1.getGeocode().getRow() - o2.getGeocode().getRow();
+            int diff2 = o1.getGeocode().getColumn() - o2.getGeocode().getColumn();
+            if (diff1 == 0)
+            {
+                return diff2;
+            }
+            return diff1;
+        });
 
-        Mesh mesh = new TriangleMesh(1);
-        mesh.add(sub[0],1,2,false);
-        mesh.add(sub[1],2,1,false);
-        mesh.add(sub[2],1,1,false);
-        mesh.add(sub[3],1,3,false);
+        for (MiddleArcSurfaceTriangle tri : triangleList)
+        {
+            System.out.println(tri.getGeocode().toString());
+        }
+        System.out.println("total: " + triangleList.size());
 
-        System.out.println("Mesh:");
-        System.out.println(mesh);
+        int j = OctahedronBaseID.H.getIndex();
+        for (int i = 0; i < j; i++)
+        {
+            System.out.println(OctahedronBaseID.indexOf(i));
+        }
+        System.out.println();
+        System.out.println(OctahedronBaseID.indexOf(10));
+        System.out.println(OctahedronBaseID.valueOf("A").ordinal());
+        System.out.println(OctahedronBaseID.valueOf("A").name());
+        System.out.println(OctahedronBaseID.valueOf("A"));
 
-        System.out.println(sub[0].getClass().getSuperclass());
-        System.out.println(Cell.class.getName());
-        System.out.println(sub[0].getClass().getSuperclass().getName().equals(Cell.class.getName()));
+        System.out.println("==");
+        String A = "A";
+        String B = "B";
+        System.out.println(A.compareTo(B));
 
-//        double a = 1.00000000000000002;
-//        double b = 1.00000000000000001;
-//        boolean ab = (a - b) > 0;
-//        System.out.println(ab);
-//        double c = 1f;
-//        double d = 1.0;
-//        System.out.println(c);
-//        System.out.println(d);
-//
-//        int[] te = new int[]{1,2,3,4,5};
-//        System.out.println(Arrays.toString(te));
+    }
 
-
-
-//        Cell triangle = new MiddleArcTriangle(p1, p2, p3,"0");
-//        Cell[] subcells = triangle.refine();
-//
-//        TriangleMesh mesh = new TriangleMesh(1);
-//        mesh.add(subcells[0],-1,-1);
-//        mesh.add(subcells[1],-1,-1);
-//        mesh.add(subcells[2],-1,-1);
-//        mesh.add(subcells[3],-1,-1);
-
-
-
-
-
-//        System.out.println(triangle.computeArea());
-//        System.out.println(triangle.getUnitArea());
-//        System.out.println("================");
-//        double area = Math.PI*4*Math.pow(DGGS.getGlobe().getRadius(),2)/8.0;
-//        System.out.println(area);
-//        System.out.println("---------------");
-//        System.out.println(triangle.toString());
-//        LatLon center = triangle.getCenter();
-//        System.out.println("center " + center.toString());
-
+    static void refineTriangle(int level, List<MiddleArcSurfaceTriangle> triangles)
+    {
+        List<MiddleArcSurfaceTriangle> tempList = new ArrayList<>();
+        for (int i = 0; i < level; i++)
+        {
+            for (MiddleArcSurfaceTriangle tri : triangles)
+            {
+                tempList.addAll(Arrays.asList(tri.refine()));
+            }
+            triangles.clear();
+            triangles.addAll(tempList);
+            tempList.clear();
+        }
     }
 }

@@ -36,8 +36,8 @@ public class ZhaoQTMView extends ApplicationTemplate
         public ZhaoQTMApp()
         {
             super();
-            int level = 4;
-            Cell cell = Octant.getInstance().getFacet(1);
+            int level = 1;
+            Cell cell = Octant.getInstance().getFacet(4);
             ZhaoQTM qtm1 = new ZhaoQTM(cell, level);
             draw(qtm1);
 

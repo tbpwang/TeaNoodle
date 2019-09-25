@@ -21,71 +21,73 @@ public class Queryer
 {
     public static void main(String[] args)
     {
-        // constructoro
+        // constructor
         int level = 8;
-        TriangleMesh tempMesh = new TriangleMesh(level);
-        TriangleMesh mesh = new TriangleMesh(level);
-        double startTimes = System.currentTimeMillis();
-        for (SphericalTriangleOctahedron polygon : SphericalTriangleOctahedron.values())
-        {
-            List<MiddleArcSurfaceTriangle> triangleList = new ArrayList<>();
-            MiddleArcSurfaceTriangle baseTriangle = (MiddleArcSurfaceTriangle) polygon.baseTriangle();
-
-            triangleList.add(baseTriangle);
-            List<MiddleArcSurfaceTriangle> temp;
-
-            for (int i = 0; i < level; i++)
-            {
-                temp = new ArrayList<>();
-                for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
-                {
-                    temp.addAll(Arrays.asList(middleArcTriangle.refine()));
-                }
-                if (!temp.isEmpty())
-                {
-                    triangleList.clear();
-                    triangleList.addAll(temp);
-                }
-            }
-            double endTime1 = System.currentTimeMillis();
-            System.out.println((endTime1 - startTimes) + "");
-            for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
-            {
-                tempMesh.addNode(middleArcTriangle);
-            }
-        }
-        System.out.println("===================");
-
-        startTimes = System.currentTimeMillis();
-        int meshSize = tempMesh.getNodes().size();
-        // 只算一个八分体的面
-        int listSize = meshSize / 8;
-        List<Mesh.Node> nodeList = new ArrayList<>(tempMesh.getNodes().subList(0, listSize));
-//        int count = 0;
-        for (Mesh.Node node : nodeList)
-        {
-            tempMesh.fillNeighbors(node);
-//            System.out.println(++count);
-        }
-//        double endTimes = System.currentTimeMillis();
-//        System.out.println("FilledSuccessfully");
-//        double interval = (endTimes - startTimes) / 1000.0;
-//        System.out.println(interval);
-        // construction
-        mesh.setNodes(nodeList);
+//        TriangleMesh tempMesh = new TriangleMesh(level);
+//        TriangleMesh mesh = new TriangleMesh(level);
+////        double startTimes = System.currentTimeMillis();
+//        for (SphericalTriangleOctahedron polygon : SphericalTriangleOctahedron.values())
+//        {
+//            List<MiddleArcSurfaceTriangle> triangleList = new ArrayList<>();
+//            MiddleArcSurfaceTriangle baseTriangle = (MiddleArcSurfaceTriangle) polygon.baseTriangle();
+//
+//            triangleList.add(baseTriangle);
+//            List<MiddleArcSurfaceTriangle> temp;
+//
+//            for (int i = 0; i < level; i++)
+//            {
+//                temp = new ArrayList<>();
+//                for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
+//                {
+//                    temp.addAll(Arrays.asList(middleArcTriangle.refine()));
+//                }
+//                if (!temp.isEmpty())
+//                {
+//                    triangleList.clear();
+//                    triangleList.addAll(temp);
+//                }
+//            }
+//            double endTime1 = System.currentTimeMillis();
+////            System.out.println((endTime1 - startTimes) + "");
+//            for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
+//            {
+//                tempMesh.addNode(middleArcTriangle);
+//            }
+//        }
+//        System.out.println("===================");
+//
+////        startTimes = System.currentTimeMillis();
+//        int meshSize = tempMesh.getNodes().size();
+//        // 只算一个八分体的面
+//        int listSize = meshSize / 8;
+//        List<Mesh.Node> nodeList = new ArrayList<>(tempMesh.getNodes().subList(0, listSize));
+////        int count = 0;
+//        for (Mesh.Node node : nodeList)
+//        {
+//            tempMesh.fillNeighbors(node);
+////            System.out.println(++count);
+//        }
+////        double endTimes = System.currentTimeMillis();
+////        System.out.println("FilledSuccessfully");
+////        double interval = (endTimes - startTimes) / 1000.0;
+////        System.out.println(interval);
+//        // construction
+//        mesh.setNodes(nodeList);
 
         // output
-        startTimes = System.currentTimeMillis();
-        for (Mesh.Node node : nodeList)
-        {
-            IO.write("Node", (Cell) node.getCell());
-            List<Mesh.Neighbor> neighborList = node.getNeighborList();
-            for (Mesh.Neighbor n : neighborList)
-            {
-                IO.write("Node", Integer.toString(level), n.toString());
-                System.out.print("");
-            }
-        }
+//        startTimes = System.currentTimeMillis();
+//        MiddleArcNode middleArcNode = new MiddleArcNode(level);
+//        List<Mesh.Node> nodeList = middleArcNode.getNode();
+//        for (Mesh.Node node : nodeList)
+//        {
+//            IO.write("Node", (Cell) node.getCell());
+//            List<Mesh.Neighbor> neighborList = node.getNeighborList();
+//            for (Mesh.Neighbor n : neighborList)
+//            {
+//                IO.write("Node", Integer.toString(level), n.toString());
+//                System.out.print("");
+//            }
+//        }
 //        endTimes = System.currentTimeMillis();
 //        System.out.println(((endTimes - startTimes) / 1000) + "");
     }

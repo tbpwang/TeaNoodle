@@ -17,7 +17,6 @@ import gov.nasa.worldwind.render.Path;
  */
 public class SurfaceTriangle extends Cell
 {
-
     public SurfaceTriangle(LatLon top, LatLon left, LatLon right, String ID)
     {
         super(top, left, right, ID);

@@ -22,7 +22,7 @@ public class MidArcCal extends ApplicationTemplate
 {
     public static void main(String[] args)
     {
-        int level = 10;
+        int level = 3;
 
         SpTriangle triangle = SphereIcosahedron.getInstance().getSpFacets(7);
 

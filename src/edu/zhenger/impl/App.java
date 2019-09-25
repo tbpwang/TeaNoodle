@@ -38,7 +38,7 @@ public class App extends ApplicationTemplate//EsriShapefile
         {
             super(true, true, false);
 
-            int level = 0;
+            int level = 3;
 
 //            PolygonData polygonData = null;
 //            Calculator calculator = null;

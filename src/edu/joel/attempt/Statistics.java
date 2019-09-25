@@ -23,7 +23,7 @@ public class Statistics
     public static void main(String[] args)
     {
         // constructor
-        int level = 6;
+        int level = 3;
 //        MidArcTriangleMesh fullMesh = new MidArcTriangleMesh(level);
         ZhaoTriangleMesh fullMesh = new ZhaoTriangleMesh(level);
 

@@ -31,9 +31,9 @@ public class IO
         return true;
     }
 
-    public static void write(String fileName, String level, String content)
+    public static void write(String folderName, String fileName, String content)
     {
-        String path = "D:\\outData\\" + fileName + "\\";
+        String path = "D:\\outData\\" + folderName + "\\";
         if (!checkPath(path))
         {
             String message = Logging.getMessage("FileError.创建文件夹出错");
@@ -42,7 +42,7 @@ public class IO
         }
 
         FileWriter rt;
-        String pathFileName = path + level + ".txt";
+        String pathFileName = path + fileName + ".txt";
         String outContent = "   " + content;
         try
         {
@@ -59,9 +59,9 @@ public class IO
         }
     }
 
-    public static void write(String fileName, Cell cell)
+    public static void write(String folderName, Cell cell)
     {
-        String path = "D:\\outData\\" + fileName + "\\";
+        String path = "D:\\outData\\" + folderName + "\\";
         if (!checkPath(path))
         {
             String message = Logging.getMessage("FileError.创建文件夹出错");
@@ -84,21 +84,21 @@ public class IO
         }
     }
 
-    public static void write(String fileName, Cell[] cells)
+    public static void write(String folderName, Cell[] cells)
     {
         if (cells != null)
             for (Cell cell : cells)
             {
-                write(fileName, cell);
+                write(folderName, cell);
             }
     }
 
-    public static void write(String fileName, List<Cell> cellList)
+    public static void write(String folderName, List<Cell> cellList)
     {
         if (cellList != null)
             for (Cell cell : cellList)
             {
-                write(fileName, cell);
+                write(folderName, cell);
             }
     }
 }

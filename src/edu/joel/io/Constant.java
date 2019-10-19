@@ -25,7 +25,8 @@ public final class Constant
     private static Vec4 center = Vec4.ZERO;
     // 长半轴a＝6378137(m), Earth.WGS84_EQUATORIAL_RADIUS
     // 与CGCS2000或WGS84相同表面积的球半径近似为：R2= 6371007.2(m)
-    public final static double radius = 6371007.2;//6371.007km
+//    public final static double radius = 6371007.2;//6371.007km
+    public final static double radius = 6371.0072;
 
     public static int NEIGHBOR_TYPE_EDGE = 1;
 

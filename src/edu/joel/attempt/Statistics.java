@@ -46,6 +46,7 @@ public class Statistics
             area.append(AreaLatitudeRelated.deltaArea(kappa, sinc)).append(",");
         }
         IO.write("ZhaoTriangleMesh", "phi_" + String.valueOf(level), area.toString());
+//        System.out.println(area);
         //以上部分仅适用于ZhaoTriangle
 
         // statistics
@@ -59,8 +60,8 @@ public class Statistics
         private static double coefficientKappa(int level)
         {
             // level > 4
-            double R = Constant.getEarth().getRadius();
-            return Math.pow(Math.PI, 3) * Math.pow(R, 2) / Math.pow(2, 2 * level + 4);
+            double radius = Constant.radius;
+            return Math.pow(Math.PI, 3) * Math.pow(radius, 2) / Math.pow(2, 2 * level + 4);
         }
 
         // chi = pi/2 - latitude

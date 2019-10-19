@@ -6,11 +6,9 @@
 
 package edu.joel.attempt;
 
-import edu.joel.SurfaceTriangle;
 import edu.joel.io.Constant;
+import edu.joel.model.HolhosEqualArea;
 import gov.nasa.worldwind.geom.*;
-
-import java.text.ChoiceFormat;
 
 /**
  * @author Zheng WANG
@@ -21,19 +19,40 @@ public class SimpleTest
 {
     public static void main(String[] args)
     {
-        ChoiceFormat fmt = new ChoiceFormat(
-            "-1#is negative| 0#is zero or fraction | 1#is one |1.0<is 1+ |2#is two |2<is more than 2.");
-        System.out.println("Formatter Pattern : " + fmt.toPattern());
-        System.out.println("Format with -INF : " + fmt.format(Double.NEGATIVE_INFINITY));
-        System.out.println("Format with -1.0 : " + fmt.format(-1.0));
-        System.out.println("Format with 0 : " + fmt.format(0));
-        System.out.println("Format with 0.9 : " + fmt.format(0.9));
-        System.out.println("Format with 1.0 : " + fmt.format(1));
-        System.out.println("Format with 1.5 : " + fmt.format(1.5));
-        System.out.println("Format with 2 : " + fmt.format(2));
-        System.out.println("Format with 2.1 : " + fmt.format(2.1));
-        System.out.println("Format with NaN : " + fmt.format(Double.NaN));
-        System.out.println("Format with +INF : " + fmt.format(Double.POSITIVE_INFINITY));
+//        double length = Math.sqrt(Math.PI/Math.sqrt(3));
+        double length = Constant.radius;
+//        Vec4 v1,v2,v3;
+//        v1 = new Vec4(length,0,0);
+//        v2 = new Vec4(0,length,0);
+//        v3 = new Vec4(0,0,length);
+        Vec4 p1 = HolhosEqualArea.planePoint(length, 0, 0);
+        Vec4 p2 = HolhosEqualArea.planePoint(0, length, 0);
+        Vec4 p3 = HolhosEqualArea.planePoint(0, 0, length);
+        System.out.println("P1" + p1);
+        System.out.println(HolhosEqualArea.inversePoint(p1));
+        System.out.println("P2" + p2);
+        System.out.println(HolhosEqualArea.inversePoint(p2));
+        System.out.println("P3" + p3);
+        System.out.println(HolhosEqualArea.inversePoint(p3));
+
+        LatLon latLon = LatLon.fromDegrees(45, 30);
+        Vec4 p4 = HolhosEqualArea.planePoint(latLon);
+        System.out.println("P4" + p4);
+        System.out.println(HolhosEqualArea.inversePoint(p4));
+
+//        ChoiceFormat fmt = new ChoiceFormat(
+//            "-1#is negative| 0#is zero or fraction | 1#is one |1.0<is 1+ |2#is two |2<is more than 2.");
+//        System.out.println("Formatter Pattern : " + fmt.toPattern());
+//        System.out.println("Format with -INF : " + fmt.format(Double.NEGATIVE_INFINITY));
+//        System.out.println("Format with -1.0 : " + fmt.format(-1.0));
+//        System.out.println("Format with 0 : " + fmt.format(0));
+//        System.out.println("Format with 0.9 : " + fmt.format(0.9));
+//        System.out.println("Format with 1.0 : " + fmt.format(1));
+//        System.out.println("Format with 1.5 : " + fmt.format(1.5));
+//        System.out.println("Format with 2 : " + fmt.format(2));
+//        System.out.println("Format with 2.1 : " + fmt.format(2.1));
+//        System.out.println("Format with NaN : " + fmt.format(Double.NaN));
+//        System.out.println("Format with +INF : " + fmt.format(Double.POSITIVE_INFINITY));
 
 //        Vec4 vx = new Vec4(1, 0, 0);
 //        Vec4 vy = new Vec4(0, 1, 0);
@@ -78,10 +97,7 @@ public class SimpleTest
 //        System.out.println("linearAzimuth(pa,pb) = "+LatLon.linearAzimuth(pa,pb).radians);
 //        LatLon.interpolate("",0.5,pa,pb);
 
-
 //        SurfacePolygon
-
-
 
 //        LatLon p1 = LatLon.fromDegrees(45.0, 0.0);
 //        LatLon p2 = LatLon.fromDegrees(45.0, 180.0);

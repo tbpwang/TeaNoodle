@@ -25,7 +25,7 @@ public class DispersionMeasure
     {
 //        String polyhedron = "Icosahedron";
         String polyhedron = "Octahedron";
-        int level = 7;
+        int level = 4;
 //        List<Vec4> points = initIcosahedron();
 //        List<Vec4> points = initOctahedron();
 //        List<LatLon> points = initIcosahedron("");

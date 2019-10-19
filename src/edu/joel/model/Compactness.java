@@ -29,7 +29,7 @@ public class Compactness
 
     public static double getSphereCompactness(double area, double perimeter, double radius)
     {
-        double c = 0;
+        double c = 0.0;
         if (radius != 0.0 && perimeter != 0.0)
         {
             c = (4 * Math.PI * area * radius * radius - area * area) / Math.pow(radius * perimeter, 2);

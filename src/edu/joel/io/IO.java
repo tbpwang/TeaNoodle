@@ -31,7 +31,7 @@ public class IO
         return true;
     }
 
-    public static void write(String folderName, String fileName, String content)
+    public static void write(String folderName, String title, String content)
     {
         String path = "D:\\outData\\" + folderName + "\\";
         if (!checkPath(path))
@@ -42,7 +42,7 @@ public class IO
         }
 
         FileWriter rt;
-        String pathFileName = path + fileName + ".txt";
+        String pathFileName = path + title + ".txt";
         String outContent = "   " + content;
         try
         {

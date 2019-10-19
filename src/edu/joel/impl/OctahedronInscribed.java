@@ -35,14 +35,14 @@ public class OctahedronInscribed
 
 //        facets = new ArrayList<>();
         facets = new Triangle[8];
-        facets[0] = new Triangle(points.get(0), points.get(2), points.get(4));
-        facets[1] = new Triangle(points.get(0), points.get(5), points.get(2));
-        facets[2] = new Triangle(points.get(1), points.get(4), points.get(2));
-        facets[3] = new Triangle(points.get(1), points.get(2), points.get(5));
-        facets[4] = new Triangle(points.get(0), points.get(4), points.get(3));
-        facets[5] = new Triangle(points.get(0), points.get(3), points.get(5));
-        facets[6] = new Triangle(points.get(1), points.get(3), points.get(4));
-        facets[7] = new Triangle(points.get(1), points.get(5), points.get(3));
+        facets[0] = new Triangle(points.get(4), points.get(0), points.get(2));
+        facets[1] = new Triangle(points.get(4), points.get(2), points.get(1));
+        facets[2] = new Triangle(points.get(4), points.get(1), points.get(3));
+        facets[3] = new Triangle(points.get(4), points.get(3), points.get(0));
+        facets[4] = new Triangle(points.get(5), points.get(0), points.get(2));
+        facets[5] = new Triangle(points.get(5), points.get(2), points.get(1));
+        facets[6] = new Triangle(points.get(5), points.get(1), points.get(3));
+        facets[7] = new Triangle(points.get(5), points.get(3), points.get(0));
     }
 
     public static OctahedronInscribed getInstance()

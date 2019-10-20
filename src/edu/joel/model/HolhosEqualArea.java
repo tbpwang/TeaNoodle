@@ -20,13 +20,16 @@ public class HolhosEqualArea
     // P'(X,Y,Z) in the plane, called planePoint or point3D
     // P(x,y,z) on the sphere, called surfacePoint or inversePoint
     // theta is a co-latitude in radians, and phi is a longitude in radians.
-    public static Vec4 planePoint(LatLon spherePoint)
+    public static Vec4 toPlanePoint(LatLon spherePoint)
     {
-        return planePoint((Math.PI/2 - spherePoint.latitude.radians),spherePoint.longitude.radians);
+        double colatitude = Math.signum(spherePoint.latitude.radians) * (Math.PI / 2 - Math.abs(
+            spherePoint.latitude.radians));
+        return toPlanePoint(colatitude, spherePoint.longitude.radians);
     }
-    public static Vec4 planePoint(Vec4 spherePoint)
+
+    public static Vec4 toPlanePoint(Vec4 spherePoint)
     {
-        return planePoint(spherePoint.getX(), spherePoint.getY(), spherePoint.getZ());
+        return toPlanePoint(spherePoint.getX(), spherePoint.getY(), spherePoint.getZ());
 //        double x,y,z;
 //        x = spherePoint.getX();
 //        y = spherePoint.getY();
@@ -42,7 +45,7 @@ public class HolhosEqualArea
 
     }
 
-    public static Vec4 planePoint(double sphereX, double sphereY, double sphereZ)
+    public static Vec4 toPlanePoint(double sphereX, double sphereY, double sphereZ)
     {
         double R = Constant.radius;
         if (!isUnitSphere(sphereX, sphereY, sphereZ))
@@ -62,7 +65,7 @@ public class HolhosEqualArea
         return vec4.multiply3(R);
     }
 
-    public static Vec4 planePoint(double coLatitude, double longitude)
+    public static Vec4 toPlanePoint(double coLatitude, double longitude)
     {
         double L = Math.sqrt(2 * Math.PI / Math.sqrt(3));
         double ldivsqrt2 = L / Math.sqrt(2);
@@ -71,16 +74,18 @@ public class HolhosEqualArea
         double X = Math.signum(Math.cos(longitude)) * ldivsqrt2 * sqrt1subabscosphi * (Math.PI - 2 * arctanabstantheta)
             / Math.PI;
         double Y = Math.signum(Math.sin(longitude)) * ldivsqrt2 * sqrt1subabscosphi * 2 * arctanabstantheta / Math.PI;
-        double Z = Math.signum(Math.cos(coLatitude)) * ldivsqrt2 * (1 - sqrt1subabscosphi);
-        return (new Vec4(X, Y, Z)).multiply3(Constant.radius);
+//        double Z = Math.signum(Math.cos(coLatitude)) * ldivsqrt2 * (1 - sqrt1subabscosphi);
+        double Z = Math.signum(Math.sin(coLatitude)) * ldivsqrt2 * (1 - sqrt1subabscosphi);
+        Vec4 vec4 = new Vec4(X, Y, Z);
+        return vec4.multiply3(Constant.radius);
     }
 
-    public static LatLon inversePoint(Vec4 planePoint)
+    public static LatLon toSpherePoint(Vec4 planePoint)
     {
-        return inversePoint(planePoint.getX(), planePoint.getY(), planePoint.getZ());
+        return toSpherePoint(planePoint.getX(), planePoint.getY(), planePoint.getZ());
     }
 
-    public static LatLon inversePoint(double planeX, double planeY, double planeZ)
+    public static LatLon toSpherePoint(double planeX, double planeY, double planeZ)
     {
         double R = Constant.radius;
 //        double X = Math.abs(planeX) >= R ? planeX / R : planeX;
@@ -94,7 +99,8 @@ public class HolhosEqualArea
             planeZ = planeZ / R;
         }
         double L = Math.sqrt(2 * Math.PI / Math.sqrt(3));
-        double sqrt1subpowZ2 = Math.sqrt(1 - Math.pow(planeZ, 2));
+//        double sqrt1subpowZ2 = Math.sqrt(1 - Math.pow(planeZ, 2));
+        double sqrt1subpowZ2 = Math.abs(planeZ) >= 1 ? Math.sqrt(Math.pow(planeZ, 2) - 1) : Math.sqrt(1 - Math.pow(planeZ, 2));
         double piYdivXaddYdiv2 = Math.PI * planeY / (2.0 * (Math.signum(planeY / planeX) * planeX + planeY));
         if (Double.isNaN(piYdivXaddYdiv2) && planeY == 0)
         {

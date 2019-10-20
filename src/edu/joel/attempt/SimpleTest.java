@@ -21,24 +21,21 @@ public class SimpleTest
     {
 //        double length = Math.sqrt(Math.PI/Math.sqrt(3));
         double length = Constant.radius;
-//        Vec4 v1,v2,v3;
-//        v1 = new Vec4(length,0,0);
-//        v2 = new Vec4(0,length,0);
-//        v3 = new Vec4(0,0,length);
-        Vec4 p1 = HolhosEqualArea.planePoint(length, 0, 0);
-        Vec4 p2 = HolhosEqualArea.planePoint(0, length, 0);
-        Vec4 p3 = HolhosEqualArea.planePoint(0, 0, length);
-        System.out.println("P1" + p1);
-        System.out.println(HolhosEqualArea.inversePoint(p1));
-        System.out.println("P2" + p2);
-        System.out.println(HolhosEqualArea.inversePoint(p2));
-        System.out.println("P3" + p3);
-        System.out.println(HolhosEqualArea.inversePoint(p3));
 
-        LatLon latLon = LatLon.fromDegrees(45, 30);
-        Vec4 p4 = HolhosEqualArea.planePoint(latLon);
+//        Vec4 p1 = HolhosEqualArea.toPlanePoint(-length, 0, 0);
+//        Vec4 p2 = HolhosEqualArea.toPlanePoint(0, -length, 0);
+//        Vec4 p3 = HolhosEqualArea.toPlanePoint(0, 0, length);
+//        System.out.println("P1" + p1);
+//        System.out.println(HolhosEqualArea.toSpherePoint(p1));
+//        System.out.println("P2" + p2);
+//        System.out.println(HolhosEqualArea.toSpherePoint(p2));
+//        System.out.println("P3" + p3);
+//        System.out.println(HolhosEqualArea.toSpherePoint(p3));
+
+        LatLon latLon = LatLon.fromDegrees(-75, 30);
+        Vec4 p4 = HolhosEqualArea.toPlanePoint(latLon);
         System.out.println("P4" + p4);
-        System.out.println(HolhosEqualArea.inversePoint(p4));
+        System.out.println(HolhosEqualArea.toSpherePoint(p4));
 
 //        ChoiceFormat fmt = new ChoiceFormat(
 //            "-1#is negative| 0#is zero or fraction | 1#is one |1.0<is 1+ |2#is two |2<is more than 2.");

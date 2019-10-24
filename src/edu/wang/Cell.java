@@ -1,0 +1,188 @@
+/*
+ * Copyright (C) 2019 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration.
+ * All Rights Reserved.
+ */
+
+package edu.wang;
+
+import edu.wang.io.Cons;
+import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.render.*;
+import gov.nasa.worldwind.util.Logging;
+
+import java.util.*;
+
+/**
+ * @author Zheng WANG
+ * @create 2019/4/28
+ * @description 闭合基本单元格，attributes of a cell
+ * @parameter 构成单元格的顶点（初始顶点和终结顶点相同），地理编码ID
+ */
+public abstract class Cell extends DGG implements Area, Refinement
+{
+
+    //    // 表示单元格的基本形状取值为：
+//    // "TRI"(3),"QUA"(4),"HEX"(6)....
+    private int shape;
+    private int level;
+
+    private List<LatLon> geoVertices;
+
+    // reference point
+    private LatLon center;
+
+    // Geo-coding
+    private Geocode geocode;
+
+    public Cell(Iterable<? extends LatLon> locations, String ID)
+    {
+        if (locations == null)
+        {
+            String message = Logging.getMessage("nullValue.VertexIsNull");
+            Logging.logger().severe(message);
+            throw new IllegalArgumentException(message);
+        }
+        geoVertices = new ArrayList<>();
+
+        for (LatLon point : locations)
+        {
+            geoVertices.add(point);
+        }
+
+        shape = geoVertices.size() - 1;
+
+        if (!geoVertices.get(0).equals(geoVertices.get(shape)))
+        {
+            geoVertices.add(geoVertices.get(0));
+            shape++;
+        }
+
+        if (shape < 3)
+        {
+            String message = Logging.getMessage("lackValue.VertexLessThan3");
+            Logging.logger().severe(message);
+            throw new IllegalArgumentException(message);
+        }
+        //this.globe = DGGS.getGlobe();
+        center = LatLon.getCenter(Cons.getGlobe(), locations);
+        geocode = new Geocode(ID);
+        this.level = ID.length() - 1;
+    }
+
+    public Cell(LatLon top, LatLon left, LatLon right, String ID)
+    {
+        if (top == null || left == null || right == null)
+        {
+            String message = Logging.getMessage("nullValue.VertexIsNull");
+            Logging.logger().severe(message);
+            throw new IllegalArgumentException(message);
+        }
+        geoVertices = new ArrayList<>();
+        geoVertices.add(top);
+        geoVertices.add(left);
+        geoVertices.add(right);
+        geoVertices.add(top);
+        center = LatLon.getCenter(Cons.getGlobe(), geoVertices);
+        shape = 3;
+        geocode = new Geocode(ID);
+        this.level = ID.length() - 1;
+    }
+
+    public int getLevel()
+    {
+        return level;
+    }
+
+    public abstract double getUnitArea();
+
+//    public abstract double computeArea();
+
+    public abstract Cell[] refine();
+
+    public abstract Path[] renderPath();
+
+    public int getShape()
+    {
+        return shape;
+    }
+
+    public LatLon getCenter()
+    {
+        return center;
+    }
+
+    public Geocode getGeocode()
+    {
+        return geocode;
+    }
+
+    public List<LatLon> getGeoVertices()
+    {
+        return geoVertices;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(geoVertices, geocode.getID(), level);
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder locations = new StringBuilder();
+
+        int counter = 1;
+        int total = geoVertices.size();
+        for (LatLon ll : geoVertices)
+        {
+            if (counter++ != total)
+            {
+                locations.append(ll.toString());
+            }
+        }
+
+        return "{" +
+            getGeocode().toString() +
+            ", " + shape +
+            ", " + locations.toString() +
+            '}';
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Cell cell = (Cell) o;
+//        return shape == cell.shape &&
+//            level == cell.level &&
+//            Objects.equals(geoVertices, cell.geoVertices) &&
+//            Objects.equals(center, cell.center) &&
+//            Objects.equals(geocode, cell.geocode);
+//
+//        if (this == o)
+//            return true;
+//        if (o == null || getClass() != o.getClass())
+//            return false;
+//        Cell cell = (Cell) o;
+        boolean isEqual = true;
+        for (int i = 0; i < getGeoVertices().size(); i++)
+        {
+//            geoVertices.get(i).equals(cell.geoVertices.get(i));
+            if (!LatLon.equals(getGeoVertices().get(i), cell.getGeoVertices().get(i)))
+            {
+                isEqual = false;
+                break;
+            }
+        }
+//        if (cell.level != -1 && level != -1 && cell.level != level)
+//        {
+//            isEqual = false;
+//        }
+        return isEqual && geocode.getID().equals(cell.geocode.getID());
+    }
+}

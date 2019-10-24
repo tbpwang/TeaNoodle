@@ -23,85 +23,88 @@ public class NeighborhoodFinder
     public static void main(String[] args)
     {
         // constructor
-        int level = 1;
-        TriangleMesh tempMesh = new TriangleMesh(level);
-        TriangleMesh mesh = new TriangleMesh(level);
-
-        for (SphericalTriangleOctahedron polygon : SphericalTriangleOctahedron.values())
+        int level = 10;
+        for (int counter = 1; counter <= level; counter++)
         {
-            List<MiddleArcSurfaceTriangle> triangleList = new ArrayList<>();
-            triangleList.add(polygon.baseTriangle());
+            TriangleMesh tempMesh = new TriangleMesh(counter);
+            TriangleMesh mesh = new TriangleMesh(counter);
 
-            List<MiddleArcSurfaceTriangle> temp;
-
-            for (int i = 0; i < level; i++)
+            for (SphericalTriangleOctahedron polygon : SphericalTriangleOctahedron.values())
             {
-                temp = new ArrayList<>();
+                List<MiddleArcSurfaceTriangle> triangleList = new ArrayList<>();
+                triangleList.add(polygon.baseTriangle());
+
+                List<MiddleArcSurfaceTriangle> temp;
+
+                for (int i = 0; i < counter; i++)
+                {
+                    temp = new ArrayList<>();
+                    for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
+                    {
+                        temp.addAll(Arrays.asList(middleArcTriangle.refine()));
+                    }
+                    if (!temp.isEmpty())
+                    {
+                        triangleList.clear();
+                        triangleList.addAll(temp);
+                    }
+                }
+
                 for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
                 {
-                    temp.addAll(Arrays.asList(middleArcTriangle.refine()));
-                }
-                if (!temp.isEmpty())
-                {
-                    triangleList.clear();
-                    triangleList.addAll(temp);
+                    tempMesh.addNode(middleArcTriangle);
                 }
             }
 
-            for (MiddleArcSurfaceTriangle middleArcTriangle : triangleList)
-            {
-                tempMesh.addNode(middleArcTriangle);
-            }
-        }
-
-        int meshSize = tempMesh.getNodes().size();
-        // 只算一个八分体的面
-        int listSize = meshSize / 8;
-        List<Mesh.Node> nodeList = new ArrayList<>(tempMesh.getNodes().subList(0, listSize));
+            int meshSize = tempMesh.getNodes().size();
+            // 只算一个八分体的面
+            int listSize = meshSize / 8;
+            List<Mesh.Node> nodeList = new ArrayList<>(tempMesh.getNodes().subList(0, listSize));
 //        int count = 0;
-        for (Mesh.Node node : nodeList)
-        {
-            tempMesh.fillNeighbors(node);
-        }
-
-        // construction
-        mesh.setNodes(nodeList);
-
-        String fileFolder = "mesh";
-        String fileName = "mesh" + level;
-        StringBuilder contents = new StringBuilder();
-        for (Mesh.Node node : mesh.getNodes())
-        {
-            MiddleArcSurfaceTriangle mine = (MiddleArcSurfaceTriangle) node.getCell();
-            contents.append(mine.getGeocode().getID()).append("\t");
-            LatLon myCenter = mine.getCenter();
-            LatLon middleA = LatLon.interpolateGreatCircle(0.5, mine.getLeft(), mine.getRight());
-            LatLon middleB = LatLon.interpolateGreatCircle(0.5, mine.getTop(), mine.getRight());
-            LatLon MiddleC = LatLon.interpolateGreatCircle(0.5, mine.getLeft(), mine.getTop());
-            List<Mesh.Neighbor> neighborList = node.getNeighborList();
-            // 两边心距
-            StringBuilder tempContents = new StringBuilder();
-            for (Mesh.Neighbor n : neighborList)
+            for (Mesh.Node node : nodeList)
             {
-                MiddleArcSurfaceTriangle other = (MiddleArcSurfaceTriangle) n.getNode().getCell();
-                LatLon otherCenter = other.getCenter();
-                tempContents.append(
-                    LatLon.greatCircleDistance(myCenter, otherCenter).getRadians() * Cons.radius).append("\t");
+                tempMesh.fillNeighbors(node);
+            }
 
-                if (n.getType() == 1)
+            // construction
+            mesh.setNodes(nodeList);
+
+            String fileFolder = "mesh";
+            String fileName = "mesh" + counter;
+            StringBuilder contents = new StringBuilder();
+            for (Mesh.Node node : mesh.getNodes())
+            {
+                MiddleArcSurfaceTriangle mine = (MiddleArcSurfaceTriangle) node.getCell();
+                contents.append(mine.getGeocode().getID()).append("\t");
+                LatLon myCenter = mine.getCenter();
+                LatLon middleA = LatLon.interpolateGreatCircle(0.5, mine.getLeft(), mine.getRight());
+                LatLon middleB = LatLon.interpolateGreatCircle(0.5, mine.getTop(), mine.getRight());
+                LatLon MiddleC = LatLon.interpolateGreatCircle(0.5, mine.getLeft(), mine.getTop());
+                List<Mesh.Neighbor> neighborList = node.getNeighborList();
+                // 两边心距
+                StringBuilder tempContents = new StringBuilder();
+                for (Mesh.Neighbor n : neighborList)
                 {
-                    LatLon centersMiddle = LatLon.interpolateGreatCircle(0.5, myCenter, otherCenter);
-                    contents.append(nearDistance(centersMiddle, middleA, middleB, MiddleC)).append("\t");
+                    MiddleArcSurfaceTriangle other = (MiddleArcSurfaceTriangle) n.getNode().getCell();
+                    LatLon otherCenter = other.getCenter();
+                    tempContents.append(
+                        LatLon.greatCircleDistance(myCenter, otherCenter).getRadians() * Cons.radius).append("\t");
+
+                    if (n.getType() == 1)
+                    {
+                        LatLon centersMiddle = LatLon.interpolateGreatCircle(0.5, myCenter, otherCenter);
+                        contents.append(nearDistance(centersMiddle, middleA, middleB, MiddleC)).append("\t");
+                    }
                 }
-            }
 //            System.out.println(neighborList.size());
-            for (int i = 0; i < 12 - neighborList.size(); i++)
-            {
-                tempContents.append("0").append("\t");
+                for (int i = 0; i < 12 - neighborList.size(); i++)
+                {
+                    tempContents.append("0").append("\t");
+                }
+                contents.append(tempContents.toString()).append(System.lineSeparator());
             }
-            contents.append(tempContents.toString()).append(System.lineSeparator());
+            IO.write(fileFolder, fileName, contents.toString());
         }
-        IO.write(fileFolder, fileName, contents.toString());
     }
 
     private static double nearDistance(LatLon p0, LatLon p1, LatLon p2, LatLon p3)

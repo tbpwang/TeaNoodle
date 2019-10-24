@@ -79,11 +79,13 @@ public abstract class Cell extends DGG implements Area, Refinement
             throw new IllegalArgumentException(message);
         }
         geoVertices = new ArrayList<>();
+        ArrayList<LatLon> temp = new ArrayList<>();
+        temp.add(top);
+        temp.add(left);
+        temp.add(right);
+        center = LatLon.getCenter(Cons.getGlobe(), temp);
+        geoVertices.addAll(temp);
         geoVertices.add(top);
-        geoVertices.add(left);
-        geoVertices.add(right);
-        geoVertices.add(top);
-        center = LatLon.getCenter(Cons.getGlobe(), geoVertices);
         shape = 3;
         geocode = new Geocode(ID);
         this.level = ID.length() - 1;

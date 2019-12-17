@@ -47,12 +47,12 @@ public class CompactnessImpl
             b = Cons.vec4ToLatLon(instance.getFacets()[i].getB());
             c = Cons.vec4ToLatLon(instance.getFacets()[i].getC());
             perimeterPlSp = new ArrayList<>(2);
-            perimeterPlSp.add(Perimeter.getPlanePerimeter(instance.getFacets()[i]));
-            perimeterPlSp.add(Perimeter.getSpherePerimeter(a, b, c));
+            perimeterPlSp.add(Perimeter.trianglePerimeter(instance.getFacets()[i]));
+            perimeterPlSp.add(Perimeter.sphericalTrianglePerimeter(a, b, c));
             perimeter.add(perimeterPlSp);
             areaPlSp = new ArrayList<>(2);
-            areaPlSp.add(Area.getPlaneArea(instance.getFacets()[i]));
-            areaPlSp.add(Area.getSphereArea(a, b, c));
+            areaPlSp.add(Area.planeTriangleArea(instance.getFacets()[i]));
+            areaPlSp.add(Area.sphericalTriangleArea(a, b, c));
             area.add(areaPlSp);
 
             delta = Math.abs(areaPlSp.get(1) - baseSphericalFacetArea);

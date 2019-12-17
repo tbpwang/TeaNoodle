@@ -18,7 +18,7 @@ import java.util.*;
  * @description 统计MidArcTriangleMesh
  *              统计ZhaoTriangleMesh并与Goodchild面积公式做比较
  */
-public class Statistics
+public class Comparison
 {
     public static void main(String[] args)
     {

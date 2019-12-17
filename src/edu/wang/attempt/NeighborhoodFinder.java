@@ -71,29 +71,45 @@ public class NeighborhoodFinder
 
             String fileFolder = "mesh";
             String fileName = "mesh" + counter;
-            StringBuilder contents = new StringBuilder();
+//            StringBuilder contents = new StringBuilder();
             for (Mesh.Node node : mesh.getNodes())
             {
+                StringBuilder contents = new StringBuilder();
+                contents.append("ID\t").append("延伸度OA\t").append("延伸度OB\t").append("延伸度OC\t").append(
+                    "两线中点距离1\t").append("两线中点距离2\t").append("两线中点距离3\t").append("两格元心距离1——12\t");
                 MiddleArcSurfaceTriangle mine = (MiddleArcSurfaceTriangle) node.getCell();
                 contents.append(mine.getGeocode().getID()).append("\t");
+//                StringBuilder vertices = new StringBuilder();
+//                vertices.append(IO.formatDouble(Cons.latLonToVec4(mine.getTop())).);
                 LatLon myCenter = mine.getCenter();
+                // 计算延伸度
+                double lengthA = LatLon.greatCircleDistance(myCenter, mine.getTop()).getRadians() * Cons.radius;
+                double lengthB = LatLon.greatCircleDistance(myCenter, mine.getLeft()).getRadians() * Cons.radius;
+                double lengthC = LatLon.greatCircleDistance(myCenter, mine.getRight()).getRadians() * Cons.radius;
+                contents.append(IO.formatDouble(lengthA, 6)).append("\t");
+                contents.append(IO.formatDouble(lengthB, 6)).append("\t");
+                contents.append(IO.formatDouble(lengthC, 6)).append("\t");
+
                 LatLon middleA = LatLon.interpolateGreatCircle(0.5, mine.getLeft(), mine.getRight());
                 LatLon middleB = LatLon.interpolateGreatCircle(0.5, mine.getTop(), mine.getRight());
                 LatLon MiddleC = LatLon.interpolateGreatCircle(0.5, mine.getLeft(), mine.getTop());
                 List<Mesh.Neighbor> neighborList = node.getNeighborList();
-                // 两边心距
+                // 两边中点距离，getType() == 1
+                // 两元中心点距离 tempContents
                 StringBuilder tempContents = new StringBuilder();
                 for (Mesh.Neighbor n : neighborList)
                 {
                     MiddleArcSurfaceTriangle other = (MiddleArcSurfaceTriangle) n.getNode().getCell();
                     LatLon otherCenter = other.getCenter();
                     tempContents.append(
-                        LatLon.greatCircleDistance(myCenter, otherCenter).getRadians() * Cons.radius).append("\t");
+                        IO.formatDouble(LatLon.greatCircleDistance(myCenter, otherCenter).getRadians() * Cons.radius,
+                            6)).append("\t");
 
                     if (n.getType() == 1)
                     {
                         LatLon centersMiddle = LatLon.interpolateGreatCircle(0.5, myCenter, otherCenter);
-                        contents.append(nearDistance(centersMiddle, middleA, middleB, MiddleC)).append("\t");
+                        contents.append(
+                            IO.formatDouble(nearDistance(centersMiddle, middleA, middleB, MiddleC), 6)).append("\t");
                     }
                 }
 //            System.out.println(neighborList.size());
@@ -101,9 +117,12 @@ public class NeighborhoodFinder
                 {
                     tempContents.append("0").append("\t");
                 }
-                contents.append(tempContents.toString()).append(System.lineSeparator());
+                // contents.append(tempContents.toString()).append(System.lineSeparator());
+                contents.append(tempContents.toString());
+                IO.write(fileFolder, fileName, contents.toString());
             }
-            IO.write(fileFolder, fileName, contents.toString());
+            IO.write(fileFolder, fileName, System.lineSeparator());
+            //System.out.println(counter);
         }
     }
 

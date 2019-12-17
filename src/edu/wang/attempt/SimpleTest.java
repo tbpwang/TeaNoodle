@@ -8,7 +8,7 @@ package edu.wang.attempt;
 
 import edu.wang.Geocode;
 import edu.wang.impl.OctahedronInscribed;
-import edu.wang.io.*;
+import edu.wang.io.Cons;
 import edu.wang.model.*;
 import gov.nasa.worldwind.geom.*;
 
@@ -17,59 +17,143 @@ import java.util.*;
 /**
  * @author Zheng WANG
  * @create 2019/6/5
- * @description
+ * @description 临时测试程序
  */
 public class SimpleTest
 {
     public static void main(String[] args)
     {
-        Triangle triangle = OctahedronInscribed.getInstance().getFacetList().get(0);
-        LatLon top = Cons.vec4ToLatLon(triangle.getA());
-        LatLon left = Cons.vec4ToLatLon(triangle.getB());
-        LatLon right = Cons.vec4ToLatLon(triangle.getC());
-        MiddleArcSurfaceTriangle surfaceTriangle = new MiddleArcSurfaceTriangle(top,left,right,new Geocode("A"));
-        int level  = 1;
-        List<MiddleArcSurfaceTriangle> subTriangles = Arrays.asList(surfaceTriangle.refine());
-        subTriangles.sort((o1, o2) -> {
-            int diff1 = o1.getGeocode().getRow() - o2.getGeocode().getRow();
-            int diff2 = o1.getGeocode().getColumn() - o2.getGeocode().getColumn();
-            if (diff1 == 0)
-            {
-                return diff2;
-            }
-            return diff1;
-        });
-        Set<LatLon> set = new HashSet<>();
-        List<LatLon> vertices = new ArrayList<>();
-        for (MiddleArcSurfaceTriangle tri :
-            subTriangles)
+        System.out.println("1111111111111111111111111");
+        LatLon tp1 = LatLon.fromDegrees(80,20);
+        LatLon tp2 = LatLon.fromDegrees(58,68);
+        double d1 = LatLon.greatCircleDistance(tp1,tp2).radians*Cons.radius;
+        double d2 = Distance.distance(tp1,tp2);
+        System.out.println("GCDist = " + d1);
+        System.out.println("Dist = " + d2);
+        System.out.println("d1/d2 = " + (d1/d2));
+        double an1 = LatLon.greatCircleAzimuth(tp1,tp2).degrees;
+        double an2 = Azimuth.azimuth(tp1,tp2).degrees;
+        System.out.println("GCAzimuth = " +an1);
+        System.out.println("Azimuth = " + an2);
+
+        System.out.println("222222222222222222222222");
+        int capacity = 8;
+        OctahedronInscribed instance = OctahedronInscribed.getInstance();
+        // List<List<Vec4>> surfacePoints = new ArrayList<>(8);
+        // 初始基本形状
+        List<Double> planeAreas = new ArrayList<>(capacity);
+        List<List<Double>> planeEdges = new ArrayList<>(capacity);
+        //List<Double> facetEdges = new ArrayList<>(3);
+        List<Double> sphericalAreas = new ArrayList<>(capacity);
+        List<List<Double>> sphericalEdges = new ArrayList<>(capacity);
+        List<MiddleArcSurfaceTriangle> spTriangles = new ArrayList<>(capacity);
+        //List<Double> spTriEdges = new ArrayList<>(3);
+        for (Triangle tri :
+            instance.getFacetList())
         {
-//            if (tri.isUp())
-//            {
-//                if (set.add(tri.getLeft()))
-//                {
-//                    vertices.add(tri.getLeft());
-//                }
-//                if (set.add(tri.getRight()))
-//                {
-//                    vertices.add(tri.getRight());
-//                }
-//            }
-//            if (tri.getGeocode().getRow()==Math.pow(2,level))
-//            {
-//                if (set.add(tri.getTop()))
-//                {
-//                    vertices.add(tri.getTop());
-//                }
-//            }
-        }
-        System.out.println(set.size());
-        for (LatLon vertex :
-            vertices)
-        {
-            System.out.println(vertex);
+            Vec4 v1, v2, v3;
+            v1 = tri.getA();
+            v2 = tri.getB();
+            v3 = tri.getC();
+            planeAreas.add(Area.planeTriangleArea(v1, v2, v3));
+            planeEdges.add(Perimeter.triangleEdges(v1, v2, v3));
+            LatLon p1, p2, p3;
+            p1 = Cons.vec4ToLatLon(v1);
+            p2 = Cons.vec4ToLatLon(v2);
+            p3 = Cons.vec4ToLatLon(v3);
+            spTriangles.add(new MiddleArcSurfaceTriangle(p1,p2,p3,new Geocode()));
+            sphericalEdges.add(Perimeter.sphericalTriangleEdge(p1, p2, p3));
+            sphericalAreas.add(Area.sphericalTriangleArea(p1, p2, p3));
         }
 
+        String folderName = "SQT\\level0";
+        MiddleArcSurfaceTriangle first, second;
+        first = spTriangles.get(0);
+        second =spTriangles.get(1);
+        LatLon fstCenter = first.getCenter();
+        LatLon secCenter = second.getCenter();
+        LatLon fstSecMiddle = LatLon.interpolateGreatCircle(0.5,fstCenter,secCenter);
+        LatLon fstA,fstB, fstC;
+        fstA = LatLon.interpolateGreatCircle(0.5,first.getLeft(),first.getRight());
+        fstB = LatLon.interpolateGreatCircle(0.5,first.getRight(),first.getTop());
+        fstC = LatLon.interpolateGreatCircle(0.5,first.getLeft(),first.getTop());
+        d1 = LatLon.linearDistance(fstSecMiddle,fstA).radians;
+        d2 = LatLon.linearDistance(fstSecMiddle,fstB).radians;
+        double d3 = LatLon.linearDistance(fstSecMiddle,fstC).radians;
+        double middleDistance = Math.min(Math.min(d1,d2),d3)*Cons.radius;
+        ///IO.write(folderName,"elong_0",String.valueOf(middleDistance));
+
+        for (int i = 0; i < capacity; i++)
+        {
+            MiddleArcSurfaceTriangle triangle = spTriangles.get(i);
+            LatLon center = triangle.getCenter();
+            LatLon top,left,right;
+            top = triangle.getTop();
+            left = triangle.getLeft();
+            right = triangle.getRight();
+            // elong
+            String strElong = LatLon.greatCircleDistance(center, top).getRadians() * Cons.radius + "\t"
+                + LatLon.greatCircleDistance(center, left).getRadians() * Cons.radius + "\t"
+                + LatLon.greatCircleDistance(center, right).getRadians() * Cons.radius + "\t";
+            ///IO.write(folderName,"elong_0", strElong);
+            // area
+            ///IO.write(folderName,"area_0",planeAreas.get(i).toString());
+            ///IO.write(folderName,"sphereArea_0",sphericalAreas.get(i).toString());
+            // edge
+            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder spStrBuilder = new StringBuilder();
+            for (int j = 0; j < 3; j++)
+            {
+                stringBuilder.append(planeEdges.get(i).get(j)).append("\t");
+                spStrBuilder.append(sphericalEdges.get(i).get(j)).append("\t");
+            }
+            ///IO.write(folderName,"edge_0",stringBuilder.toString());
+            ///IO.write(folderName,"sphereEdge_0",spStrBuilder.toString());
+
+        }
+        System.out.println("=============");
+        double spc = Compactness.getSphereCompactness(sphericalAreas.get(0),sphericalEdges.get(0).get(0)*3);
+        System.out.println("SphereCompactness = " + spc);
+        System.out.println("Area = " + 4*Math.PI*Math.pow(Cons.radius,2)/8);
+
+//        Triangle triangle = OctahedronInscribed.getInstance().getFacetList().get(0);
+//        LatLon top = Cons.vec4ToLatLon(triangle.getA());
+//        LatLon left = Cons.vec4ToLatLon(triangle.getB());
+//        LatLon right = Cons.vec4ToLatLon(triangle.getC());
+//        MiddleArcSurfaceTriangle surfaceTriangle = new MiddleArcSurfaceTriangle(top,left,right,new Geocode("A"));
+//        int level  = 1;
+//        List<MiddleArcSurfaceTriangle> subTriangles = Arrays.asList(surfaceTriangle.refine());
+//        subTriangles.sort((o1, o2) -> Cons.sortByRow(o1.getGeocode(),o2.getGeocode()));
+//        Set<LatLon> set = new HashSet<>();
+//        List<LatLon> vertices = new ArrayList<>();
+//        for (MiddleArcSurfaceTriangle tri :
+//            subTriangles)
+//        {
+////            if (tri.isUp())
+////            {
+////                if (set.add(tri.getLeft()))
+////                {
+////                    vertices.add(tri.getLeft());
+////                }
+////                if (set.add(tri.getRight()))
+////                {
+////                    vertices.add(tri.getRight());
+////                }
+////            }
+////            if (tri.getGeocode().getRow()==Math.pow(2,level))
+////            {
+////                if (set.add(tri.getTop()))
+////                {
+////                    vertices.add(tri.getTop());
+////                }
+////            }
+//        }
+//        System.out.println(set.size());
+//        for (LatLon vertex :
+//            vertices)
+//        {
+//            System.out.println(vertex);
+//        }
 
 //        double a = 12345678901.123456789;
 //        System.out.println(IO.formatDouble(a));
@@ -78,7 +162,6 @@ public class SimpleTest
 //        MidArcTriangleMesh fullMesh = new MidArcTriangleMesh(3);
 //        MidArcTriangleMesh triangleMesh = fullMesh.cutMesh(1);//1-8
 //        triangleMesh.
-
 
 ////        double length = Math.sqrt(Math.PI/Math.sqrt(3));
 //        double length = Constant.radius;

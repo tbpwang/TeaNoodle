@@ -88,6 +88,15 @@ public final class Cons
 
         return attributes;
     }
+    public static ShapeAttributes defaultPathAttribute(Color color)
+    {
+        ShapeAttributes attributes = new BasicShapeAttributes();
+        // for Path
+        attributes.setOutlineMaterial(new Material(color));
+        attributes.setOutlineWidth(2.0);
+
+        return attributes;
+    }
     public static double check(double value)
     {
         return Math.abs(value) <= epsilon ? 0.0 : value;
@@ -146,9 +155,9 @@ public final class Cons
     {
         double x, y, z;
         double phi = latLon.getLatitude().radians;
-        double lambda = latLon.getLongitude().radians;
-        x = Math.cos(phi) * Math.cos(lambda);
-        y = Math.cos(phi) * Math.sin(lambda);
+        double theta = latLon.getLongitude().radians;
+        x = Math.cos(phi) * Math.cos(theta);
+        y = Math.cos(phi) * Math.sin(theta);
         z = Math.sin(phi);
         return check(x, y, z);
     }

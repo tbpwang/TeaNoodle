@@ -29,8 +29,8 @@ public class EssentialVariable
         //
         // facet-ID
         // 0-A,1-B,2-C,3-D,4-E,5-F,6-G,7-H
-        int facet = 3;
-        String ID = "D";
+        int facet = 0;
+        String ID = "A";
 
         MiddleArcSurfaceTriangle triangle = new MiddleArcSurfaceTriangle(
             Cons.changeTriangleVertexes(octahedron.getFacetList().get(facet)), new Geocode(ID));
@@ -76,26 +76,28 @@ public class EssentialVariable
                     }
                 }
 
-                content = new StringBuilder();
-                content.append(tri.getGeocode().getID()).append("\t");
-                content.append(IO.formatDouble(tri.computeArea())).append("\t");
-                content.append(IO.formatDouble(tri.interiorAngleDegree().get(0), 6)).append("\t");
-                content.append(IO.formatDouble(tri.interiorAngleDegree().get(1), 6)).append("\t");
-                content.append(IO.formatDouble(tri.interiorAngleDegree().get(2), 6)).append("\t");
-                content.append(IO.formatDouble(tri.lengthOfEdgeDegree().get(0))).append("\t");
-                content.append(IO.formatDouble(tri.lengthOfEdgeDegree().get(1))).append("\t");
-                content.append(IO.formatDouble(tri.lengthOfEdgeDegree().get(2))).append("\t");
-                IO.write(folder, fileName, content.toString());
+//                content = new StringBuilder();
+//                content.append(tri.getGeocode().getID()).append("\t");
+//                content.append(IO.formatDouble(tri.computeArea())).append("\t");
+//                content.append(IO.formatDouble(tri.interiorAngleDegree().get(0), 6)).append("\t");
+//                content.append(IO.formatDouble(tri.interiorAngleDegree().get(1), 6)).append("\t");
+//                content.append(IO.formatDouble(tri.interiorAngleDegree().get(2), 6)).append("\t");
+//                content.append(IO.formatDouble(tri.lengthOfEdgeDegree().get(0))).append("\t");
+//                content.append(IO.formatDouble(tri.lengthOfEdgeDegree().get(1))).append("\t");
+//                content.append(IO.formatDouble(tri.lengthOfEdgeDegree().get(2))).append("\t");
+//                IO.write(folder, fileName, content.toString());
             }
             if (facet == 0)
             {
 //                String vertexTxtName = folder + "Vertex_" + i;
-                String vertexTxtName = "vertex_" + i;
+                String vertexTxtName = "spPoint_" + i;
                 for (LatLon ver : vertices)
                 {
-                    String latLonString = IO.formatDouble(ver.getLatitude().getDegrees(), 6) + "\t" + IO.formatDouble(
-                        ver.getLongitude().getDegrees(), 6);
-                    IO.write(folder, vertexTxtName, latLonString);
+                    Vec4 v = Cons.latLonToVec4(ver).normalize3().multiply3(Cons.radius);
+                    String vecString = IO.formatDouble(v.getX(), 6) + "\t"
+                        + IO.formatDouble(v.getY(), 6) + "\t"
+                        + IO.formatDouble(v.getZ(), 6) + "\t";
+                    IO.write(folder, vertexTxtName, vecString);
                 }
             }
         }

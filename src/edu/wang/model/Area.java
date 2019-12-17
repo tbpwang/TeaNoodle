@@ -17,7 +17,7 @@ import gov.nasa.worldwind.util.Logging;
  */
 public class Area
 {
-    public static double getPlaneArea(Vec4 a, Vec4 b, Vec4 c)
+    public static double planeTriangleArea(Vec4 a, Vec4 b, Vec4 c)
     {
         if (a == null || b == null || c == null)
         {
@@ -38,7 +38,7 @@ public class Area
         return Math.sqrt(half * (half - lab) * (half - lac) * (half - lbc)) * Math.pow(Cons.radius, 2);
     }
 
-    public static double getPlaneArea(Triangle triangle)
+    public static double planeTriangleArea(Triangle triangle)
     {
         if (triangle == null)
         {
@@ -50,10 +50,10 @@ public class Area
 //        a = triangle.getA();
 //        b = triangle.getB();
 //        c = triangle.getC();
-        return getPlaneArea(triangle.getA(), triangle.getB(), triangle.getC());
+        return planeTriangleArea(triangle.getA(), triangle.getB(), triangle.getC());
     }
 
-    public static double getSphereArea(LatLon a, LatLon b, LatLon c)
+    public static double sphericalTriangleArea(LatLon a, LatLon b, LatLon c)
     {
         if (a == null || b == null || c == null)
         {

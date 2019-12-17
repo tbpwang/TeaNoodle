@@ -10,6 +10,8 @@ import edu.wang.io.Cons;
 import gov.nasa.worldwind.geom.*;
 import gov.nasa.worldwind.util.Logging;
 
+import java.util.*;
+
 /**
  * @author Zheng WANG
  * @create 2019/9/22
@@ -17,23 +19,28 @@ import gov.nasa.worldwind.util.Logging;
  */
 public class Perimeter
 {
-    public static double getPlanePerimeter(Vec4 a, Vec4 b, Vec4 c)
+    public static List<Double> triangleEdges(Vec4 p1, Vec4 p2, Vec4 p3)
     {
-        if (a == null || b == null || c == null)
+        if (p1 == null || p2 == null || p3 == null)
         {
-            String msg = Logging.getMessage("顶点有空值");
+            String msg = Logging.getMessage("nullValue.三角形为空");
             Logging.logger().severe(msg);
             throw new IllegalArgumentException(msg);
         }
-
-        Vec4 p1 = a.normalize3();
-        Vec4 p2 = b.normalize3();
-        Vec4 p3 = c.normalize3();
-
-        return (p1.distanceTo3(p2) + p1.distanceTo3(p3) + p2.distanceTo3(p3)) * Cons.radius;
+        List<Double> edgeList = new ArrayList<>(3);
+        edgeList.add(p1.distanceTo3(p2));
+        edgeList.add(p1.distanceTo3(p3));
+        edgeList.add(p2.distanceTo3(p3));
+        return edgeList;
     }
 
-    public static double getPlanePerimeter(Triangle triangle)
+    public static double trianglePerimeter(Vec4 a, Vec4 b, Vec4 c)
+    {
+        List<Double> edges = triangleEdges(a, b, c);
+        return edges.get(0) + edges.get(1) + edges.get(2);
+    }
+
+    public static double trianglePerimeter(Triangle triangle)
     {
         if (triangle == null)
         {
@@ -41,18 +48,26 @@ public class Perimeter
             Logging.logger().severe(msg);
             throw new IllegalArgumentException(msg);
         }
-        return getPlanePerimeter(triangle.getA(), triangle.getB(), triangle.getC());
+        return trianglePerimeter(triangle.getA(), triangle.getB(), triangle.getC());
     }
 
-    public static double getSpherePerimeter(LatLon a, LatLon b, LatLon c)
+    public static List<Double> sphericalTriangleEdge(LatLon a, LatLon b, LatLon c)
     {
         if (a == null || b == null || c == null)
         {
-            String msg = Logging.getMessage("顶点有空值");
+            String msg = Logging.getMessage("nullValue.顶点有空值");
             Logging.logger().severe(msg);
             throw new IllegalArgumentException(msg);
         }
-        return Cons.radius * (LatLon.greatCircleDistance(a, b).radians + LatLon.greatCircleDistance(a, c).radians
-            + LatLon.greatCircleDistance(b, c).radians);
+        List<Double> edgeList = new ArrayList<>(3);
+        edgeList.add(LatLon.greatCircleDistance(a, b).getRadians() * Cons.radius);
+        edgeList.add(LatLon.greatCircleDistance(a, c).getRadians() * Cons.radius);
+        edgeList.add(LatLon.greatCircleDistance(c, b).getRadians() * Cons.radius);
+        return edgeList;
+    }
+
+    public static double sphericalTrianglePerimeter(LatLon a, LatLon b, LatLon c)
+    {
+        return sphericalTriangleEdge(a, b, c).get(0) + sphericalTriangleEdge(a, b, c).get(1) + sphericalTriangleEdge(a, b, c).get(2);
     }
 }
